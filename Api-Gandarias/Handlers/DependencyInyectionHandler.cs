@@ -69,6 +69,7 @@ public class DependencyInyectionHandler
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IWorkAreaService, WorkAreaService>();
     }
 
     public static void RepositoryRegistration(IServiceCollection services)
@@ -76,5 +77,6 @@ public class DependencyInyectionHandler
         services.AddScoped<IQueryableUnitOfWork, DBContext>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IWorkAreaRepository, WorkAreaRepository>();
     }
 }

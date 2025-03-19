@@ -11,6 +11,7 @@ namespace CC.Domain
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<LoginUserDto, User>().ReverseMap();
             CreateMap<Role, RoleDto>().ReverseMap();
+            CreateMap<WorkArea, WorkAreaDto>().ReverseMap();
         }
     }
 }
