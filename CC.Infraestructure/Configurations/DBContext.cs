@@ -40,32 +40,32 @@ namespace CC.Infrastructure.Configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.HasPostgresExtension("uuid-ossp");
-            modelBuilder.Entity<User>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            //modelBuilder.HasPostgresExtension("uuid-ossp");
+            modelBuilder.Entity<User>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<User>().Property(p => p.FirstName).HasMaxLength(20);
             modelBuilder.Entity<User>().Property(p => p.LastName).HasMaxLength(20);
 
             modelBuilder.Entity<Role>().HasKey(c => c.Id);
-            modelBuilder.Entity<Role>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<Role>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
 
             modelBuilder.Entity<Permission>().HasKey(c => c.Id);
-            modelBuilder.Entity<Permission>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<Permission>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Permission>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<RolePermission>().HasKey(c => c.Id);
-            modelBuilder.Entity<RolePermission>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<RolePermission>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<RolePermission>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<WorkArea>().HasKey(c => c.Id);
-            modelBuilder.Entity<WorkArea>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<WorkArea>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<WorkArea>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<Workstation>().HasKey(c => c.Id);
-            modelBuilder.Entity<Workstation>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<Workstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Workstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<WorkstationWorkArea>().HasKey(c => c.Id);
-            modelBuilder.Entity<WorkstationWorkArea>().Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            modelBuilder.Entity<WorkstationWorkArea>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<WorkstationWorkArea>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
