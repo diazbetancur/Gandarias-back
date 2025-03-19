@@ -1,0 +1,245 @@
+﻿using AutoMapper;
+using CC.Domain.Dtos;
+using CC.Domain.Entities;
+using CC.Domain.Helpers;
+using CC.Domain.Interfaces.Repositories;
+using CC.Domain.Interfaces.Services;
+using CC.Domain.Services;
+using CC.Infrastructure.EmailServices;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace CC.Application.Services
+{
+    public class UserService : ServiceBase<User, UserDto>, IUserService
+    {
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+
+        public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration) : base(userRepository, mapper)
+        {
+            _userRepository = userRepository;
+            _mapper = mapper;
+            _configuration = configuration;
+        }
+
+        public async Task<ActionResponse<User>> AddUserAsync(UserDto user, string password)
+        {
+            password = Extensions.GeneratePassword();
+            var existingUser = await _userRepository.GetUserAsync(user.DNI);
+            if (existingUser != null)
+            {
+                return new ActionResponse<User>
+                {
+                    WasSuccessful = true,
+                    Message = $"El usuario ya existe",
+                };
+            }
+            ActionResponse<User> resultUserCreated = await _userRepository.AddUserAsync(user, password);
+            if (resultUserCreated.WasSuccessful)
+            {
+                IdentityResult roleResult = await AddUserToRoleAsync(resultUserCreated.Result, user.RolName);
+                if (roleResult.Succeeded)
+                {
+                    return resultUserCreated;
+                }
+
+                return new ActionResponse<User>
+                {
+                    WasSuccessful = true,
+                    Result = resultUserCreated.Result,
+                    Message = $"El usuario fue creado correctamente, pero no se pudo asignar el rol {user.RolName}.",
+                };
+            }
+            return new ActionResponse<User>
+            {
+                WasSuccessful = false,
+                Message = "No se pudo crear el usuario.",
+            };
+        }
+
+        public async Task<IdentityResult> AddUserToRoleAsync(User user, string roleName)
+        {
+            return await _userRepository.AddUserToRoleAsync(user, roleName);
+        }
+
+        public Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+        {
+            return _userRepository.ConfirmEmailAsync(user, token);
+        }
+
+        public Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        {
+            return _userRepository.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<List<UserDto>> GetAllUsers()
+        {
+            List<UserDto> ListUsers = await _userRepository.GetAllUsers();
+            return _mapper.Map<List<UserDto>>(ListUsers);
+        }
+
+        public Task<User> GetUserAsync(string username)
+        {
+            return _userRepository.GetUserAsync(username);
+        }
+
+        public Task<User> GetUserByIdAsync(Guid userId)
+        {
+            return _userRepository.GetUserByIdAsync(userId);
+        }
+
+        public Task<bool> IsUserInRoleAsync(User user, string roleName)
+        {
+            return _userRepository.IsUserInRoleAsync(user, roleName);
+        }
+
+        public async Task<TokenDto> LoginAsync(LoginUserDto loginUserDto)
+        {
+            SignInResult userlogin = await _userRepository.LoginAsync(_mapper.Map<User>(loginUserDto), loginUserDto.Password);
+            if (userlogin.Succeeded)
+            {
+                User user = await _userRepository.FindByAlternateKeyAsync(x => x.UserName.ToLower().Equals(loginUserDto.UserName.ToLower().Trim()), string.Empty);
+                List<string> roles = await _userRepository.GetUserRolesAsync(user);
+                return BuildToken(user, roles);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Task LogoutAsync()
+        {
+            return _userRepository.LogoutAsync();
+        }
+
+        public async Task<ActionResponse<bool>> RemoveUserFromRoleAsync(Guid userId)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        WasSuccessful = false,
+                        Message = "Usuario no encontrado."
+                    };
+                }
+
+                var roles = await _userRepository.GetUserRolesAsync(user);
+                if (roles.Count != 0)
+                {
+                    var roleResult = await _userRepository.RemoveUserFromRoleAsync(user, roles[0]);
+                    if (!roleResult.Succeeded)
+                    {
+                        return new ActionResponse<bool>
+                        {
+                            WasSuccessful = false,
+                            Message = "Error al eliminar la relación con los roles del usuario.",
+                        };
+                    }
+                }
+
+                var deleteResult = await _userRepository.RemoveUserAsync(user);
+                if (!deleteResult.Succeeded)
+                {
+                    return new ActionResponse<bool>
+                    {
+                        WasSuccessful = false,
+                        Message = "Error al eliminar el usuario.",
+                    };
+                }
+
+                return new ActionResponse<bool>
+                {
+                    WasSuccessful = true,
+                    Message = "Usuario eliminado correctamente.",
+                    Result = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<bool>
+                {
+                    WasSuccessful = false,
+                    Message = $"Ocurrió un error al intentar eliminar el usuario. {ex.Message}",
+                };
+            }
+        }
+
+        public async Task<ActionResponse<IdentityResult>> UpdateUserAsync(UserDto userDto)
+        {
+            var userFind = await GetUserAsync(userDto.DNI);
+            if (userFind == null)
+            {
+                return new ActionResponse<IdentityResult>
+                {
+                    WasSuccessful = false,
+                    Message = "El usuario no fue encontrado.",
+                };
+            }
+
+            userFind.FirstName = userDto.FirstName ?? userDto.FirstName;
+            userFind.LastName = userDto.LastName ?? userDto.LastName;
+            userFind.Email = userDto.Email ?? userDto.Email;
+            userFind.UserName = userDto.DNI ?? userDto.DNI;
+            userFind.PhoneNumber = userDto.PhoneNumber ?? userDto.PhoneNumber;
+
+            var updateResult = await _userRepository.UpdateUserAsync(userFind);
+
+            if (updateResult.Succeeded)
+            {
+                return new ActionResponse<IdentityResult>
+                {
+                    WasSuccessful = true,
+                    Result = updateResult,
+                    Message = "El usuario se actualizó correctamente."
+                };
+            }
+
+            return new ActionResponse<IdentityResult>
+            {
+                WasSuccessful = false,
+                Message = "No se pudo actualizar el usuario.",
+            };
+        }
+
+        private TokenDto BuildToken(User user, List<string> roles)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim("LastName", user.LastName),
+                new Claim("UserName", user.UserName),
+                new Claim("UserId", user.Id.ToString()),
+                new Claim("Email", user.Email),
+                new Claim("Name", user.FirstName),
+            };
+
+            claims.Add(new Claim("Role", string.Join(",", roles)));
+
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            DateTime expiration = DateTime.UtcNow.AddHours(1);
+            JwtSecurityToken token = new JwtSecurityToken(
+                issuer: null,
+                audience: null,
+                claims: claims,
+                expires: expiration,
+                signingCredentials: creds
+            );
+
+            return new TokenDto
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = expiration
+            };
+        }
+    }
+}

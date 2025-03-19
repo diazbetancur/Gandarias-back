@@ -1,0 +1,86 @@
+﻿using CC.Application.Services;
+using CC.Domain.Dtos;
+using CC.Domain.Entities;
+using CC.Domain.Interfaces.Services;
+using CC.Infrastructure.EmailServices;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+
+namespace Verify.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserController : ControllerBase
+    {
+        private IUserService _userService;
+        private readonly IConfiguration _configuration;
+
+        public UserController(IUserService userService, IConfiguration configuration)
+        {
+            _userService = userService;
+            _configuration = configuration;
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginAsync(LoginUserDto loginUserDto)
+        {
+            TokenDto result = await _userService.LoginAsync(loginUserDto);
+            return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
+        }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            return Ok(await _userService.GetAllUsers().ConfigureAwait(false));
+        }
+
+        /// <summary>
+        /// GET api/user/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        {
+            return Ok(await _userService.GetUserByIdAsync(id).ConfigureAwait(false));
+        }
+
+        /// <summary>
+        /// POST api/user
+        /// </summary>
+        /// <param name="UserDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Post(UserDto userDTO)
+        {
+            await _userService.AddUserAsync(userDTO, userDTO.Password).ConfigureAwait(false);
+            return Ok(userDTO);
+        }
+
+        /// <summary>
+        /// PUT api/user
+        /// </summary>
+        /// returns></returns>
+        [HttpPut]
+        public async Task<IActionResult> Put(UserDto userDTO)
+        {
+            await _userService.UpdateUserAsync(userDTO).ConfigureAwait(false);
+            return Ok(userDTO);
+        }
+
+        /// <summary>
+        /// DELETE api/user/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+        /// </summary>
+        /// returns></returns>
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> Delete(Guid userId)
+        {
+            await _userService.RemoveUserFromRoleAsync(userId).ConfigureAwait(false);
+            return Ok();
+        }
+    }
+}
