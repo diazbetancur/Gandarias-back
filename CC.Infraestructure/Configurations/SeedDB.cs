@@ -27,8 +27,8 @@ public class SeedDB
         await _context.Database.EnsureCreatedAsync();
         await CheckRolesAsync();
         await ChechAdminAsync();
-        //await CheckModuleAsync();
-        //await CheckModuleRoleAsync();
+        await CheckModuleAsync();
+        await CheckRolePermissionAdminAsync();
     }
 
     private async Task CheckRolesAsync()
@@ -72,42 +72,52 @@ public class SeedDB
 
     private async Task CheckModuleAsync()
     {
-        //if (!_context.Modules.Any())
-        //{
-        //    await _context.Modules.AddRangeAsync(new List<Permission>
-        //    {
-        //        new () { Name = "home", Id = Guid.NewGuid() },
-        //        new () { Name = "Entity", Id = Guid.NewGuid() },
-        //        new () { Name = "Category", Id = Guid.NewGuid() },
-        //        new () { Name = "Fonts", Id = Guid.NewGuid() },
-        //        new () { Name = "Criterial", Id = Guid.NewGuid() },
-        //        new () { Name = "Fields", Id = Guid.NewGuid() },
-        //    });
-        //    await _context.SaveChangesAsync();
-        //}
+        if (!_context.Permissions.Any())
+        {
+            foreach (string permission in Enum.GetNames(typeof(Permissions)))
+            {
+                Permission p = new Permission
+                {
+                    Name = permission,
+                    Id = Guid.NewGuid(),
+                    DateCreated = DateTime.UtcNow
+                };
+                _context.Permissions.Add(p);
+            }
+            //await _context.Permissions.AddRangeAsync(new List<Permission>
+            //{
+            //    new () { Name = "home", Id = Guid.NewGuid() },
+            //    new () { Name = "Entity", Id = Guid.NewGuid() },
+            //    new () { Name = "Category", Id = Guid.NewGuid() },
+            //    new () { Name = "Fonts", Id = Guid.NewGuid() },
+            //    new () { Name = "Criterial", Id = Guid.NewGuid() },
+            //    new () { Name = "Fields", Id = Guid.NewGuid() },
+            //});
+            await _context.SaveChangesAsync();
+        }
     }
 
-    private async Task CheckModuleRoleAsync()
+    private async Task CheckRolePermissionAdminAsync()
     {
-        //if (!_context.ModuleRoles.Any())
-        //{
-        //    List<Permission> modules = await _context.Modules.ToListAsync();
+        if (!_context.RolePermissions.Any())
+        {
+            List<Permission> permissions = await _context.Permissions.ToListAsync();
 
-        //    List<Role> roles = await _roleRepository.GetRolesAsync();
+            List<Role> roles = await _roleRepository.GetRolesAsync();
 
-        //    Role? role = roles.FirstOrDefault(x => x.Name == RoleType.SuperAdmin.ToString());
+            Role? role = roles.FirstOrDefault(x => x.Name == RoleType.Admin.ToString());
 
-        //    foreach (Permission module in modules)
-        //    {
-        //        await _context.ModuleRoles.AddAsync(new RolePermission
-        //        {
-        //            ModuleId = module.Id,
-        //            Id = Guid.NewGuid(),
-        //            RoleId = role.Id,
-        //            DateCreated = DateTime.UtcNow
-        //        });
-        //    }
-        //    await _context.SaveChangesAsync();
-        //}
+            foreach (Permission permission in permissions)
+            {
+                await _context.RolePermissions.AddAsync(new RolePermission
+                {
+                    PermissionId = permission.Id,
+                    Id = Guid.NewGuid(),
+                    RoleId = role.Id,
+                    DateCreated = DateTime.UtcNow
+                });
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -33,14 +33,13 @@ namespace CC.Infrastructure.Configurations
         public DbSet<Workstation> Workstations { get; set; }
 
         /// <summary>
-        /// WorkstationWorkArea
+        /// UserWorkstations
         /// </summary>
-        public DbSet<WorkstationWorkArea> WorkstationWorkAreas { get; set; }
+        public DbSet<UserWorkstation> UserWorkstations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            //modelBuilder.HasPostgresExtension("uuid-ossp");
             modelBuilder.Entity<User>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<User>().Property(p => p.FirstName).HasMaxLength(20);
             modelBuilder.Entity<User>().Property(p => p.LastName).HasMaxLength(20);
@@ -64,9 +63,9 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<Workstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Workstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            modelBuilder.Entity<WorkstationWorkArea>().HasKey(c => c.Id);
-            modelBuilder.Entity<WorkstationWorkArea>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
-            modelBuilder.Entity<WorkstationWorkArea>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            modelBuilder.Entity<UserWorkstation>().HasKey(c => c.Id);
+            modelBuilder.Entity<UserWorkstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<UserWorkstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);
