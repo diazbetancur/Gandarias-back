@@ -41,6 +41,7 @@ namespace CC.Infrastructure.Repositories
                 UserName = userDto.DNI,
                 Email = userDto.Email,
                 PhoneNumber = userDto.PhoneNumber,
+                JobTitle = userDto.JobTitle,
             };
 
             var response = await _userManager.CreateAsync(newUser, password);
