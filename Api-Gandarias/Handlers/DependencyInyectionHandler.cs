@@ -71,6 +71,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IWorkAreaService, WorkAreaService>();
         services.AddScoped<IWorkstationService, WorkstationService>();
+        services.AddScoped<IRolePermissionService, RolePermissionService>();
     }
 
     public static void RepositoryRegistration(IServiceCollection services)
@@ -80,5 +81,6 @@ public class DependencyInyectionHandler
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IWorkAreaRepository, WorkAreaRepository>();
         services.AddScoped<IWorkstationRepository, WorkstationRepository>();
+        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
     }
 }

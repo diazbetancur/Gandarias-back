@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -20,12 +21,14 @@ namespace CC.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly IRolePermissionRepository _rolePermissionRepository;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration) : base(userRepository, mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, IRolePermissionRepository rolePermissionRepository) : base(userRepository, mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _configuration = configuration;
+            _rolePermissionRepository = rolePermissionRepository;
         }
 
         public async Task<ActionResponse<User>> AddUserAsync(UserDto user, string password)
@@ -106,7 +109,8 @@ namespace CC.Application.Services
             {
                 User user = await _userRepository.FindByAlternateKeyAsync(x => x.UserName.ToLower().Equals(loginUserDto.UserName.ToLower().Trim()), string.Empty);
                 List<string> roles = await _userRepository.GetUserRolesAsync(user);
-                return BuildToken(user, roles);
+                List<string> permissions = await _rolePermissionRepository.GetRolesPermissionsAsync(roles);
+                return BuildToken(user, roles, permissions);
             }
             else
             {
@@ -211,7 +215,7 @@ namespace CC.Application.Services
             };
         }
 
-        private TokenDto BuildToken(User user, List<string> roles)
+        private TokenDto BuildToken(User user, List<string> roles, List<string> permissions)
         {
             List<Claim> claims = new List<Claim>
             {
@@ -223,6 +227,7 @@ namespace CC.Application.Services
             };
 
             claims.Add(new Claim("Role", string.Join(",", roles)));
+            claims.Add(new Claim("Permissions", string.Join(",", permissions)));
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
