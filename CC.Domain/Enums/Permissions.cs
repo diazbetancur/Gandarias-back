@@ -1,0 +1,9 @@
+﻿namespace CC.Domain.Enums;
+
+public enum Permissions
+{
+    Workstation,
+    User,
+    UserWorkstation,
+    WorkArea,
+}

@@ -4,4 +4,5 @@ public class WorkArea : EntityBase<Guid>
 {
     public string Name { get; set; }
     public bool IsActive { get; set; } = true;
+    public ICollection<Workstation> AssignedEmployees { get; set; }
 }
