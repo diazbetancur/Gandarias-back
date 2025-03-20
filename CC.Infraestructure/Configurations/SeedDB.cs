@@ -29,6 +29,8 @@ public class SeedDB
         await ChechAdminAsync();
         await CheckModuleAsync();
         await CheckRolePermissionAdminAsync();
+        await CheckRolePermissionEmployeeAsync();
+        await ChechEmployeeAsync();
     }
 
     private async Task CheckRolesAsync()
@@ -59,6 +61,7 @@ public class SeedDB
                 Email = "",
                 FirstName = "admin",
                 LastName = "admin",
+                JobTitle = "Admin"
             };
 
             ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");
@@ -118,6 +121,51 @@ public class SeedDB
                 });
             }
             await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task CheckRolePermissionEmployeeAsync()
+    {
+        var exist = await _context.RolePermissions
+            .AnyAsync(x => x.Role.Name == RoleType.Employee.ToString() && x.Permission.Name == Permissions.WorkSchedule.ToString());
+
+        if (!exist)
+        {
+            List<Permission> permissions = await _context.Permissions.ToListAsync();
+            Permission permission = permissions.FirstOrDefault(x => x.Name == Permissions.WorkSchedule.ToString());
+            List<Role> roles = await _roleRepository.GetRolesAsync();
+            Role? role = roles.FirstOrDefault(x => x.Name == RoleType.Employee.ToString());
+            await _context.RolePermissions.AddAsync(new RolePermission
+            {
+                PermissionId = permission.Id,
+                Id = Guid.NewGuid(),
+                RoleId = role.Id,
+                DateCreated = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task ChechEmployeeAsync()
+    {
+        var exist = await _context.Users.AnyAsync(x => x.UserName == "Employee");
+        if (!exist)
+        {
+            var user = new UserDto
+            {
+                DNI = "Employee",
+                Email = "",
+                FirstName = "Employee",
+                LastName = "Employee",
+                JobTitle = "Employee",
+            };
+
+            ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");
+
+            if (resultUserCreated.WasSuccessful)
+            {
+                IdentityResult roleResult = await _userService.AddUserToRoleAsync(resultUserCreated.Result, RoleType.Employee.ToString());
+            }
         }
     }
 }

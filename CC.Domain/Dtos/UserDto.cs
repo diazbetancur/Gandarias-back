@@ -10,4 +10,5 @@ public class UserDto
     public string LastName { get; set; }
     public string RolName { get; set; }
     public bool? IsActive { get; set; }
+    public string JobTitle { get; set; }
 }
