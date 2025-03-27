@@ -26,7 +26,7 @@ public class WorkstationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workstationService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _workstationService.GetAllAsync(includeProperties: "WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>
