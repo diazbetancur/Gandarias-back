@@ -29,6 +29,10 @@ public class ActivityLoggingMiddleware
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<DBContext>();
+                var userId = GetUserIdFromToken(context);
+                
+                if (userId == "Unknown" || userId == "Anonymous")
+                    return;
 
                 var log = new UserActivityLog
                 {
