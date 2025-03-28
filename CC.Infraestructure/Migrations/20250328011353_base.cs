@@ -32,32 +32,17 @@ namespace CC.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "HireTypes",
                 schema: "Management",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    FirstName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    LastName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.PrimaryKey("PK_HireTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,21 +75,6 @@ namespace CC.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Workstations",
-                schema: "Management",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Workstations", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 schema: "Management",
                 columns: table => new
@@ -125,6 +95,97 @@ namespace CC.Infrastructure.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                schema: "Management",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    FirstName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    JobTitle = table.Column<string>(type: "text", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    HireTypeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_HireTypes_HireTypeId",
+                        column: x => x.HireTypeId,
+                        principalSchema: "Management",
+                        principalTable: "HireTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                schema: "Management",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    PermissionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "Management",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalSchema: "Management",
+                        principalTable: "Permissions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Workstations",
+                schema: "Management",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    WorkAreaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Workstations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Workstations_WorkAreas_WorkAreaId",
+                        column: x => x.WorkAreaId,
+                        principalSchema: "Management",
+                        principalTable: "WorkAreas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,56 +283,52 @@ namespace CC.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RolePermissions",
+                name: "UserActivityLogs",
                 schema: "Management",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    PermissionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
+                    Action = table.Column<string>(type: "text", nullable: false),
+                    IpAddress = table.Column<string>(type: "text", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RolePermissions", x => x.Id);
+                    table.PrimaryKey("PK_UserActivityLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RolePermissions_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
+                        name: "FK_UserActivityLogs_AspNetUsers_UserId1",
+                        column: x => x.UserId1,
                         principalSchema: "Management",
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_RolePermissions_Permissions_PermissionId",
-                        column: x => x.PermissionId,
-                        principalSchema: "Management",
-                        principalTable: "Permissions",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkstationWorkAreas",
+                name: "UserWorkstations",
                 schema: "Management",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
                     WorkstationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkAreaId = table.Column<Guid>(type: "uuid", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkstationWorkAreas", x => x.Id);
+                    table.PrimaryKey("PK_UserWorkstations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkstationWorkAreas_WorkAreas_WorkAreaId",
-                        column: x => x.WorkAreaId,
+                        name: "FK_UserWorkstations_AspNetUsers_UserId1",
+                        column: x => x.UserId1,
                         principalSchema: "Management",
-                        principalTable: "WorkAreas",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_WorkstationWorkAreas_Workstations_WorkstationId",
+                        name: "FK_UserWorkstations_Workstations_WorkstationId",
                         column: x => x.WorkstationId,
                         principalSchema: "Management",
                         principalTable: "Workstations",
@@ -317,6 +374,12 @@ namespace CC.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_HireTypeId",
+                schema: "Management",
+                table: "AspNetUsers",
+                column: "HireTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "Management",
                 table: "AspNetUsers",
@@ -336,16 +399,28 @@ namespace CC.Infrastructure.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkstationWorkAreas_WorkAreaId",
+                name: "IX_UserActivityLogs_UserId1",
                 schema: "Management",
-                table: "WorkstationWorkAreas",
-                column: "WorkAreaId");
+                table: "UserActivityLogs",
+                column: "UserId1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkstationWorkAreas_WorkstationId",
+                name: "IX_UserWorkstations_UserId1",
                 schema: "Management",
-                table: "WorkstationWorkAreas",
+                table: "UserWorkstations",
+                column: "UserId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserWorkstations_WorkstationId",
+                schema: "Management",
+                table: "UserWorkstations",
                 column: "WorkstationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Workstations_WorkAreaId",
+                schema: "Management",
+                table: "Workstations",
+                column: "WorkAreaId");
         }
 
         /// <inheritdoc />
@@ -376,11 +451,11 @@ namespace CC.Infrastructure.Migrations
                 schema: "Management");
 
             migrationBuilder.DropTable(
-                name: "WorkstationWorkAreas",
+                name: "UserActivityLogs",
                 schema: "Management");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers",
+                name: "UserWorkstations",
                 schema: "Management");
 
             migrationBuilder.DropTable(
@@ -392,11 +467,19 @@ namespace CC.Infrastructure.Migrations
                 schema: "Management");
 
             migrationBuilder.DropTable(
-                name: "WorkAreas",
+                name: "AspNetUsers",
                 schema: "Management");
 
             migrationBuilder.DropTable(
                 name: "Workstations",
+                schema: "Management");
+
+            migrationBuilder.DropTable(
+                name: "HireTypes",
+                schema: "Management");
+
+            migrationBuilder.DropTable(
+                name: "WorkAreas",
                 schema: "Management");
         }
     }

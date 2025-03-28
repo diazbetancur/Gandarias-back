@@ -42,6 +42,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<HireType>  HireTypes { get; set; }
 
+        /// <summary>
+        /// UserActivityLog
+        /// </summary>
+        public DbSet<UserActivityLog> UserActivityLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -75,6 +80,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<HireType>().HasKey(c => c.Id);
             modelBuilder.Entity<HireType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<HireType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<UserActivityLog>().HasKey(c => c.Id);
+            modelBuilder.Entity<UserActivityLog>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<UserActivityLog>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

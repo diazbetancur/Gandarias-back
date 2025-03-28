@@ -62,7 +62,10 @@ public class SeedDB
                 Email = "",
                 FirstName = "admin",
                 LastName = "admin",
-                JobTitle = "Admin"
+                JobTitle = "Admin",
+                HireDate = DateTime.UtcNow,
+                HireTypeId = _context.HireTypes.FirstOrDefault(x => x.Name == "Tiempo Completo")?.Id,
+                PhoneNumber = "123456789",           
             };
 
             ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");
@@ -88,15 +91,6 @@ public class SeedDB
                 };
                 _context.Permissions.Add(p);
             }
-            //await _context.Permissions.AddRangeAsync(new List<Permission>
-            //{
-            //    new () { Name = "home", Id = Guid.NewGuid() },
-            //    new () { Name = "Entity", Id = Guid.NewGuid() },
-            //    new () { Name = "Category", Id = Guid.NewGuid() },
-            //    new () { Name = "Fonts", Id = Guid.NewGuid() },
-            //    new () { Name = "Criterial", Id = Guid.NewGuid() },
-            //    new () { Name = "Fields", Id = Guid.NewGuid() },
-            //});
             await _context.SaveChangesAsync();
         }
     }
@@ -159,6 +153,9 @@ public class SeedDB
                 FirstName = "Employee",
                 LastName = "Employee",
                 JobTitle = "Employee",
+                HireDate = DateTime.UtcNow,
+                HireTypeId = _context.HireTypes.FirstOrDefault(x => x.Name == "Tiempo Completo")?.Id,
+                PhoneNumber = "123456789",                
             };
 
             ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");

@@ -212,6 +212,40 @@ namespace CC.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", "Management");
                 });
 
+            modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("UserActivityLogs", "Management");
+                });
+
             modelBuilder.Entity("CC.Domain.Entities.UserWorkstation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -426,6 +460,17 @@ namespace CC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("HireType");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>
+                {
+                    b.HasOne("CC.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CC.Domain.Entities.UserWorkstation", b =>
