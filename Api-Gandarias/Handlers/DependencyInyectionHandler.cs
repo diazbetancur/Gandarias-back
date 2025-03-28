@@ -10,7 +10,7 @@ using Serilog.Core;
 using ILogger = Serilog.ILogger;
 using Microsoft.Extensions.Configuration;
 
-namespace Verify.Handlers;
+namespace Gandarias.Handlers;
 
 public class DependencyInyectionHandler
 {
@@ -72,6 +72,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkAreaService, WorkAreaService>();
         services.AddScoped<IWorkstationService, WorkstationService>();
         services.AddScoped<IRolePermissionService, RolePermissionService>();
+        services.AddScoped<IHireTypeService, HireTypeService>();
     }
 
     public static void RepositoryRegistration(IServiceCollection services)
@@ -82,5 +83,6 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkAreaRepository, WorkAreaRepository>();
         services.AddScoped<IWorkstationRepository, WorkstationRepository>();
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+        services.AddScoped<IHireTypeRepository, HireTypeRepository>();
     }
 }

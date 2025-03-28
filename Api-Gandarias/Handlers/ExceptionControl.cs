@@ -1,4 +1,4 @@
-namespace Verify.Handlers;
+namespace Gandarias.Handlers;
 
 public class ExceptionControl
 {

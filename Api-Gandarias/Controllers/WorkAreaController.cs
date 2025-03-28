@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Verify.Controllers;
+namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,7 +20,7 @@ public class WorkAreaController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/country
+    /// GET api/WorkArea
     /// </summary>
     /// <returns></returns>
     [HttpGet]
@@ -30,7 +30,7 @@ public class WorkAreaController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// GET api/WorkArea/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -41,7 +41,7 @@ public class WorkAreaController : ControllerBase
     }
 
     /// <summary>
-    /// POST api/country
+    /// POST api/WorkArea
     /// </summary>
     /// <param name="workAreaDto"></param>
     /// <returns></returns>
@@ -53,7 +53,7 @@ public class WorkAreaController : ControllerBase
     }
 
     /// <summary>
-    /// PUT api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// PUT api/WorkArea/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="id"></param>
     /// <param name="workAreaDto"></param>
@@ -67,7 +67,7 @@ public class WorkAreaController : ControllerBase
     }
 
     /// <summary>
-    /// DELETE api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// DELETE api/WorkArea/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="workAreaDto"></param>
     /// <returns></returns>

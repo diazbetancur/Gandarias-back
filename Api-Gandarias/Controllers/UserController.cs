@@ -3,6 +3,8 @@ using CC.Domain.Dtos;
 using CC.Domain.Entities;
 using CC.Domain.Interfaces.Services;
 using CC.Infrastructure.EmailServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using System.Net;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
-namespace Verify.Controllers
+namespace Gandarias.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -32,6 +34,7 @@ namespace Verify.Controllers
             return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet()]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -43,6 +46,7 @@ namespace Verify.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
@@ -54,6 +58,7 @@ namespace Verify.Controllers
         /// </summary>
         /// <param name="UserDto"></param>
         /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         public async Task<IActionResult> Post(UserDto userDTO)
         {
@@ -65,6 +70,7 @@ namespace Verify.Controllers
         /// PUT api/user
         /// </summary>
         /// returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut]
         public async Task<IActionResult> Put(UserDto userDTO)
         {
@@ -76,6 +82,7 @@ namespace Verify.Controllers
         /// DELETE api/user/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
         /// </summary>
         /// returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("{userId}")]
         public async Task<IActionResult> Delete(Guid userId)
         {

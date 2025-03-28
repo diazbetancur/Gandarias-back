@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CC.Domain.Dtos;
 using CC.Domain.Entities;
+using CC.Domain.Enums;
 using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Repositories;
 using CC.Domain.Interfaces.Services;
@@ -33,7 +34,7 @@ namespace CC.Application.Services
 
         public async Task<ActionResponse<User>> AddUserAsync(UserDto user, string password)
         {
-            password = Extensions.GeneratePassword();
+            password = Extensions.GenerateRandomPassword();
             var existingUser = await _userRepository.GetUserAsync(user.DNI);
             if (existingUser != null)
             {
@@ -43,10 +44,12 @@ namespace CC.Application.Services
                     Message = $"El usuario ya existe",
                 };
             }
+            user.HireDate = user.HireDate != null ? user.HireDate : DateTime.UtcNow;
             ActionResponse<User> resultUserCreated = await _userRepository.AddUserAsync(user, password);
+            // Pendiente envio de correo electronico
             if (resultUserCreated.WasSuccessful)
             {
-                IdentityResult roleResult = await AddUserToRoleAsync(resultUserCreated.Result, user.RolName);
+                IdentityResult roleResult = await AddUserToRoleAsync(resultUserCreated.Result, RoleType.Employee.ToString());
                 if (roleResult.Succeeded)
                 {
                     return resultUserCreated;
@@ -195,6 +198,11 @@ namespace CC.Application.Services
             userFind.Email = userDto.Email ?? userDto.Email;
             userFind.UserName = userDto.DNI ?? userDto.DNI;
             userFind.PhoneNumber = userDto.PhoneNumber ?? userDto.PhoneNumber;
+            userFind.HireTypeId = userDto.HireTypeId;
+            userFind.JobTitle = userDto.JobTitle;
+            userFind.IsActive = (bool)userDto.IsActive;
+            if (userDto.HireDate != null)
+                userFind.HireDate = (DateTime)(userDto.HireDate != null ? userDto.HireDate : DateTime.UtcNow);
 
             var updateResult = await _userRepository.UpdateUserAsync(userFind);
 
