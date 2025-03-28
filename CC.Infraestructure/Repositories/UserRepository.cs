@@ -42,6 +42,8 @@ namespace CC.Infrastructure.Repositories
                 Email = userDto.Email,
                 PhoneNumber = userDto.PhoneNumber,
                 JobTitle = userDto.JobTitle,
+                HireDate = (DateTime)userDto.HireDate,
+                HireTypeId = userDto.HireTypeId
             };
 
             var response = await _userManager.CreateAsync(newUser, password);
@@ -122,25 +124,42 @@ namespace CC.Infrastructure.Repositories
 
         public async Task<List<UserDto>> GetAllUsers()
         {
-            List<UserDto> listUsers = await _dataContext.Users
-                        .Select(user => new UserDto
-                        {
-                            DNI = user.UserName,
-                            Email = user.Email,
-                            PhoneNumber = user.PhoneNumber,
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            RolName = string.Join(", ",
-                                _dataContext.UserRoles
-                                    .Where(ur => ur.UserId == user.Id)
-                                    .Join(_dataContext.Roles,
-                                          ur => ur.RoleId,
-                                          r => r.Id,
-                                          (ur, r) => r.Name)
-                                    .ToList()),
-                        })
+            {
+                var listUsers = await _dataContext.Users.ToListAsync();
+                var userDtos = new List<UserDto>();
+
+                foreach (var user in listUsers)
+                {
+                    var hireType = await _dataContext.HireTypes.FindAsync(user.HireTypeId);
+
+                    var rolNames = await _dataContext.UserRoles
+                        .Where(ur => ur.UserId == user.Id)
+                        .Join(_dataContext.Roles,
+                              ur => ur.RoleId,
+                              r => r.Id,
+                              (ur, r) => r.Name)
                         .ToListAsync();
-            return listUsers;
+
+                    var userDto = new UserDto
+                    {
+                        DNI = user.UserName,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        HireTypeId = user.HireTypeId,
+                        HireDate = user.HireDate,
+                        IsActive = user.IsActive,
+                        JobTitle = user.JobTitle,
+                        HireTypeName = hireType?.Name,
+                        RolName = string.Join(", ", rolNames)
+                    };
+
+                    userDtos.Add(userDto);
+                }
+
+                return userDtos;
+            }
         }
 
         public async Task<User> GetUserByEmailAsync(string email)

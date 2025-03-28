@@ -6,7 +6,7 @@ using System.Net.Http;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace Verify.Handlers;
+namespace Gandarias.Handlers;
 
 public class ErrorHandlingMiddleware
 {

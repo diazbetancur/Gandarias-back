@@ -10,4 +10,6 @@ public class User : IdentityUser<Guid>
     public bool IsActive { get; set; } = true;
     public string JobTitle { get; set; }
     public DateTime HireDate { get; set; }
+    public Guid? HireTypeId { get; set; }
+    public virtual HireType? HireType { get; set; }
 }
