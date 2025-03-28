@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace Verify.Handlers;
+namespace Gandarias.Handlers;
 
 public class SwaggerHandler
 {
@@ -8,7 +8,7 @@ public class SwaggerHandler
     {
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API - Verify", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "API - Gandarias", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Verify.Controllers;
+namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,17 +20,17 @@ public class WorkstationController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/country
+    /// GET api/Workstation
     /// </summary>
     /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workstationService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _workstationService.GetAllAsync(includeProperties: "WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>
-    /// GET api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// GET api/Workstation/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -41,7 +41,7 @@ public class WorkstationController : ControllerBase
     }
 
     /// <summary>
-    /// POST api/country
+    /// POST api/Workstation
     /// </summary>
     /// <param name="workstationDto"></param>
     /// <returns></returns>
@@ -53,7 +53,7 @@ public class WorkstationController : ControllerBase
     }
 
     /// <summary>
-    /// PUT api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// PUT api/Workstation/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="id"></param>
     /// <param name="workstationDto"></param>
@@ -67,7 +67,7 @@ public class WorkstationController : ControllerBase
     }
 
     /// <summary>
-    /// DELETE api/country/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// DELETE api/Workstation/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="workstationDto"></param>
     /// <returns></returns>

@@ -25,6 +25,7 @@ public class SeedDB
     public async Task SeedAsync()
     {
         await _context.Database.EnsureCreatedAsync();
+        await checkHireType();
         await CheckRolesAsync();
         await ChechAdminAsync();
         await CheckModuleAsync();
@@ -166,6 +167,20 @@ public class SeedDB
             {
                 IdentityResult roleResult = await _userService.AddUserToRoleAsync(resultUserCreated.Result, RoleType.Employee.ToString());
             }
+        }
+    }
+
+    private async Task checkHireType()
+    {
+        if (!_context.HireTypes.Any())
+        {
+            await _context.HireTypes.AddRangeAsync(new List<HireType>
+            {
+                new () { Name = "Tiempo Completo", Id = Guid.NewGuid() },
+                new () { Name = "Tiempo Parcial", Id = Guid.NewGuid() },
+                new () { Name = "Temporal", Id = Guid.NewGuid() },
+            });
+            await _context.SaveChangesAsync();
         }
     }
 }

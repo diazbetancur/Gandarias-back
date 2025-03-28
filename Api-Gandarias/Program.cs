@@ -1,4 +1,4 @@
-using Verify.Handlers;
+using Gandarias.Handlers;
 using CC.Domain.Entities;
 using CC.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -48,7 +48,6 @@ builder.Services.AddIdentity<User, Role>(opt =>
     opt.Password.RequireNonAlphanumeric = true;
     opt.Password.RequiredUniqueChars = 1;
     opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-    opt.Lockout.MaxFailedAccessAttempts = 3;
 }).AddRoles<Role>().AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
 
 #endregion IdentityCore
