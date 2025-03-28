@@ -123,6 +123,7 @@ app.UseCors(x => x
 app.UseHttpsRedirection();
 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 app.UseAuthentication();
+app.UseMiddleware<ActivityLoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 
