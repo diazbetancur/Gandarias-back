@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CC.Infrastructure.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20250319021309_base")]
+    [Migration("20250328011353_base")]
     partial class @base
     {
         /// <inheritdoc />
@@ -25,6 +25,27 @@ namespace CC.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CC.Domain.Entities.HireType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HireTypes", "Management");
+                });
 
             modelBuilder.Entity("CC.Domain.Entities.Permission", b =>
                 {
@@ -130,8 +151,18 @@ namespace CC.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("HireTypeId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("LastName")
                         .HasMaxLength(20)
@@ -172,6 +203,8 @@ namespace CC.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HireTypeId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -180,6 +213,71 @@ namespace CC.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", "Management");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("UserActivityLogs", "Management");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.UserWorkstation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WorkstationId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
+
+                    b.HasIndex("WorkstationId");
+
+                    b.ToTable("UserWorkstations", "Management");
                 });
 
             modelBuilder.Entity("CC.Domain.Entities.WorkArea", b =>
@@ -225,36 +323,14 @@ namespace CC.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Workstations", "Management");
-                });
-
-            modelBuilder.Entity("CC.Domain.Entities.WorkstationWorkArea", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
                     b.Property<Guid>("WorkAreaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("WorkstationId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("WorkAreaId");
 
-                    b.HasIndex("WorkstationId");
-
-                    b.ToTable("WorkstationWorkAreas", "Management");
+                    b.ToTable("Workstations", "Management");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -362,7 +438,7 @@ namespace CC.Infrastructure.Migrations
 
             modelBuilder.Entity("CC.Domain.Entities.RolePermission", b =>
                 {
-                    b.HasOne("CC.Domain.Entities.Permission", "Module")
+                    b.HasOne("CC.Domain.Entities.Permission", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -374,16 +450,37 @@ namespace CC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Module");
+                    b.Navigation("Permission");
 
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("CC.Domain.Entities.WorkstationWorkArea", b =>
+            modelBuilder.Entity("CC.Domain.Entities.User", b =>
                 {
-                    b.HasOne("CC.Domain.Entities.WorkArea", "WorkArea")
+                    b.HasOne("CC.Domain.Entities.HireType", "HireType")
                         .WithMany()
-                        .HasForeignKey("WorkAreaId")
+                        .HasForeignKey("HireTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("HireType");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>
+                {
+                    b.HasOne("CC.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.UserWorkstation", b =>
+                {
+                    b.HasOne("CC.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -393,9 +490,20 @@ namespace CC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("WorkArea");
+                    b.Navigation("User");
 
                     b.Navigation("Workstation");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.Workstation", b =>
+                {
+                    b.HasOne("CC.Domain.Entities.WorkArea", "WorkArea")
+                        .WithMany("workstations")
+                        .HasForeignKey("WorkAreaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("WorkArea");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -447,6 +555,11 @@ namespace CC.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.WorkArea", b =>
+                {
+                    b.Navigation("workstations");
                 });
 #pragma warning restore 612, 618
         }
