@@ -1,8 +1,6 @@
 ﻿using CC.Domain.Entities;
 using CC.Infrastructure.Configurations;
-using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 
 namespace Gandarias.Handlers;
@@ -25,30 +23,40 @@ public class ActivityLoggingMiddleware
             context.Request.Method == HttpMethods.Post ||
             context.Request.Method == HttpMethods.Delete)
         {
-
-            using (var scope = _serviceProvider.CreateScope())
+            try
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<DBContext>();
-                var userId = GetUserIdFromToken(context);
-                
-                if (userId == "Unknown" || userId == "Anonymous")
-                    return;
-
-                var log = new UserActivityLog
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    UserId = GetUserIdFromToken(context), 
-                    Action = $"{context.Request.Method} {context.Request.Path}",
-                    IpAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
-                    DateCreated = DateTime.UtcNow,
-                    Id = Guid.NewGuid()
-                };
+                    var dbContext = scope.ServiceProvider.GetRequiredService<DBContext>();
+                    var userId = GetUserIdFromToken(context);
 
-                dbContext.UserActivityLogs.Add(log);
-                await dbContext.SaveChangesAsync();
+                    if (userId != "Unknown" && userId != "Anonymous")
+                    {
+                        var log = new UserActivityLog
+                        {
+                            UserId = GetUserIdFromToken(context),
+                            Action = $"{context.Request.Method} {context.Request.Path}",
+                            IpAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+                            DateCreated = DateTime.UtcNow,
+                            Id = Guid.NewGuid()
+                        };
+
+                        dbContext.UserActivityLogs.Add(log);
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                }
+                await _next(context);
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UserActivityLog: {ex.Message}");
+            }
+
+           
         }
 
-        await _next(context);
     }
 
     private string GetUserIdFromToken(HttpContext context)
