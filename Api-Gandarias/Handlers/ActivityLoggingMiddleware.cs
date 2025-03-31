@@ -44,19 +44,14 @@ public class ActivityLoggingMiddleware
                         dbContext.UserActivityLogs.Add(log);
                         await dbContext.SaveChangesAsync();
                     }
-
                 }
-                await _next(context);
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in UserActivityLog: {ex.Message}");
-            }
-
-           
+            }           
         }
-
+        await _next(context);
     }
 
     private string GetUserIdFromToken(HttpContext context)
