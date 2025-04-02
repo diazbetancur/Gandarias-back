@@ -26,7 +26,7 @@ public class WorkAreaController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workAreaService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _workAreaService.GetAllAsync(x => x.IsActive).ConfigureAwait(false));
     }
 
     /// <summary>
