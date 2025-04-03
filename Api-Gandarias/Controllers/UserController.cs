@@ -34,7 +34,7 @@ namespace Gandarias.Controllers
             return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet()]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -46,7 +46,7 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
