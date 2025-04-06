@@ -5,4 +5,5 @@ namespace CC.Domain.Interfaces.Services;
 
 public interface IWorkstationService : IServiceBase<Workstation, WorkstationDto>
 {
+    Task<bool> DeleteAsync(WorkstationDto entity);
 }

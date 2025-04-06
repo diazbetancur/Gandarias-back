@@ -26,7 +26,7 @@ public class WorkstationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workstationService.GetAllAsync(x=> x.IsActive == true, includeProperties: "WorkArea").ConfigureAwait(false));
+        return Ok(await _workstationService.GetAllAsync(x=> x.IsDeleted == false, includeProperties: "WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>
@@ -75,8 +75,7 @@ public class WorkstationController : ControllerBase
     [HttpDelete()]
     public async Task<IActionResult> Delete(WorkstationDto workstationDto)
     {
-        workstationDto.IsActive = false;
-        await _workstationService.UpdateAsync(workstationDto).ConfigureAwait(false);
+        await _workstationService.DeleteAsync(workstationDto).ConfigureAwait(false);
         return Ok(workstationDto);
     }
 }

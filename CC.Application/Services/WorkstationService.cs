@@ -29,4 +29,9 @@ public class WorkstationService : ServiceBase<Workstation, WorkstationDto>, IWor
 
         return entityDto;
     }
+
+    Task<bool> IWorkstationService.DeleteAsync(WorkstationDto entity)
+    {
+        return _repository.DeleteAsync(entity);
+    }
 }
