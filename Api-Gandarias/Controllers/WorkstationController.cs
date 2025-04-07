@@ -62,7 +62,6 @@ public class WorkstationController : ControllerBase
     public async Task<IActionResult> Put(Guid id, WorkstationDto workstationDto)
     {
         workstationDto.Id = id;
-        workstationDto.IsActive = true;
         await _workstationService.UpdateAsync(workstationDto).ConfigureAwait(false);
         return Ok(workstationDto);
     }
