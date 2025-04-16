@@ -41,9 +41,11 @@ namespace CC.Infrastructure.Repositories
                 UserName = userDto.DNI,
                 Email = userDto.Email,
                 PhoneNumber = userDto.PhoneNumber,
-                JobTitle = userDto.JobTitle,
+                NickName = userDto.NickName,
                 HireDate = (DateTime)userDto.HireDate,
-                HireTypeId = userDto.HireTypeId
+                HireTypeId = userDto.HireTypeId,
+                IsDelete= false,
+                IsActive = true
             };
 
             var response = await _userManager.CreateAsync(newUser, password);
@@ -125,7 +127,7 @@ namespace CC.Infrastructure.Repositories
         public async Task<List<UserDto>> GetAllUsers()
         {
             {
-                var listUsers = await _dataContext.Users.ToListAsync();
+                var listUsers = await _dataContext.Users.Where(x => x.IsDelete == false).ToListAsync();
                 var userDtos = new List<UserDto>();
 
                 foreach (var user in listUsers)
@@ -150,7 +152,7 @@ namespace CC.Infrastructure.Repositories
                         HireTypeId = user.HireTypeId,
                         HireDate = user.HireDate,
                         IsActive = user.IsActive,
-                        JobTitle = user.JobTitle,
+                        NickName = user.NickName,
                         HireTypeName = hireType?.Name,
                         RolName = string.Join(", ", rolNames)
                     };

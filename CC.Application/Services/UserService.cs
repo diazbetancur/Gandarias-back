@@ -38,6 +38,34 @@ namespace CC.Application.Services
             var existingUser = await _userRepository.GetUserAsync(user.DNI);
             if (existingUser != null)
             {
+                if (existingUser.IsDelete == true)
+                {
+                    existingUser.IsDelete = false;
+                    existingUser.Email = user.Email;
+                    existingUser.FirstName = user.FirstName;
+                    existingUser.LastName = user.LastName;
+                    existingUser.NickName = user.NickName;
+                    existingUser.IsActive = true;
+
+                    var updateResult = await _userRepository.UpdateUserAsync(existingUser);
+
+                    if (updateResult.Succeeded)
+                    {
+                        return new ActionResponse<User>
+                        {
+                            WasSuccessful = true,
+                            Message = "El usuario se creo correctamente."
+                        };
+                    }
+
+                    return new ActionResponse<User>
+                    {
+                        WasSuccessful = true,
+                        Message = $"No se logro crear el usuario, por favor intentelo nuevamente.",
+                    };
+
+                }
+
                 return new ActionResponse<User>
                 {
                     WasSuccessful = true,
@@ -86,7 +114,7 @@ namespace CC.Application.Services
 
         public async Task<List<UserDto>> GetAllUsers()
         {
-            List<UserDto> ListUsers = await _userRepository.GetAllUsers();
+            var ListUsers = await _userRepository.GetAllUsers();
             return _mapper.Map<List<UserDto>>(ListUsers);
         }
 
@@ -140,36 +168,50 @@ namespace CC.Application.Services
                     };
                 }
 
-                var roles = await _userRepository.GetUserRolesAsync(user);
-                if (roles.Count != 0)
-                {
-                    var roleResult = await _userRepository.RemoveUserFromRoleAsync(user, roles[0]);
-                    if (!roleResult.Succeeded)
-                    {
-                        return new ActionResponse<bool>
-                        {
-                            WasSuccessful = false,
-                            Message = "Error al eliminar la relación con los roles del usuario.",
-                        };
-                    }
-                }
+                user.IsDelete = true;
 
-                var deleteResult = await _userRepository.RemoveUserAsync(user);
-                if (!deleteResult.Succeeded)
+                var updateResult = await _userRepository.UpdateUserAsync(user);
+
+                if (updateResult.Succeeded)
                 {
                     return new ActionResponse<bool>
                     {
-                        WasSuccessful = false,
-                        Message = "Error al eliminar el usuario.",
+                        WasSuccessful = true,
+                        Message = "El usuario se elimino correctamente.",
+                        Result = true
                     };
                 }
 
                 return new ActionResponse<bool>
                 {
-                    WasSuccessful = true,
-                    Message = "Usuario eliminado correctamente.",
-                    Result = true
+                    WasSuccessful = false,
+                    Message = "Usuario no fue eliminado, por favor intentelo nuevamente.",
+                    Result = false
                 };
+                //var roles = await _userRepository.GetUserRolesAsync(user);
+                //if (roles.Count != 0)
+                //{
+                //    var roleResult = await _userRepository.RemoveUserFromRoleAsync(user, roles[0]);
+                //    if (!roleResult.Succeeded)
+                //    {
+                //        return new ActionResponse<bool>
+                //        {
+                //            WasSuccessful = false,
+                //            Message = "Error al eliminar la relación con los roles del usuario.",
+                //        };
+                //    }
+                //}
+
+                //var deleteResult = await _userRepository.RemoveUserAsync(user);
+                //if (!deleteResult.Succeeded)
+                //{
+                //    return new ActionResponse<bool>
+                //    {
+                //        WasSuccessful = false,
+                //        Message = "Error al eliminar el usuario.",
+                //    };
+                //}
+
             }
             catch (Exception ex)
             {
@@ -199,7 +241,7 @@ namespace CC.Application.Services
             userFind.UserName = userDto.DNI ?? userDto.DNI;
             userFind.PhoneNumber = userDto.PhoneNumber ?? userDto.PhoneNumber;
             userFind.HireTypeId = userDto.HireTypeId;
-            userFind.JobTitle = userDto.JobTitle;
+            userFind.NickName = userDto.NickName;
             userFind.IsActive = (bool)userDto.IsActive;
             if (userDto.HireDate != null)
                 userFind.HireDate = (DateTime)(userDto.HireDate != null ? userDto.HireDate : DateTime.UtcNow);
