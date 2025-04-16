@@ -40,12 +40,22 @@ namespace CC.Infrastructure.Configurations
         /// <summary>
         /// HireTypes
         /// </summary>
-        public DbSet<HireType>  HireTypes { get; set; }
+        public DbSet<HireType> HireTypes { get; set; }
 
         /// <summary>
         /// UserActivityLog
         /// </summary>
         public DbSet<UserActivityLog> UserActivityLogs { get; set; }
+
+        /// <summary>
+        /// ShiftType
+        /// </summary>
+        public DbSet<ShiftType> ShiftTypes { get; set; }
+
+        /// <summary>
+        /// ShiftType
+        /// </summary>
+        public DbSet<ShiftSchedule> ShiftSchedules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -84,6 +94,14 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<UserActivityLog>().HasKey(c => c.Id);
             modelBuilder.Entity<UserActivityLog>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<UserActivityLog>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<ShiftType>().HasKey(c => c.Id);
+            modelBuilder.Entity<ShiftType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<ShiftType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<ShiftSchedule>().HasKey(c => c.Id);
+            modelBuilder.Entity<ShiftSchedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<ShiftSchedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

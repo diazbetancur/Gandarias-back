@@ -1,5 +1,4 @@
 ﻿using CC.Domain.Interfaces.Repositories;
-using CC.Infrastructure.Configurations;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -7,7 +6,6 @@ namespace CC.Infrastructure.Repositories
 {
     public class ERepositoryBase<TEntity> : IERepositoryBase<TEntity> where TEntity : class
     {
-
         private readonly IQueryableUnitOfWork unitOfWork;
 
         public ERepositoryBase(IQueryableUnitOfWork unitOfWork)
@@ -21,7 +19,6 @@ namespace CC.Infrastructure.Repositories
             unitOfWork.DetachLocal<TEntity>(entity, EntityState.Detached);
             return entity;
         }
-
 
         public async Task<TEntity> FindByAlternateKeyAsync(Expression<Func<TEntity, bool>> alternateKey, string includeProperties = "")
         {
@@ -52,7 +49,6 @@ namespace CC.Infrastructure.Repositories
         {
             return await BuildQuery(filter, orderBy, includeProperties).Skip(skip).Take(take).ToListAsync().ConfigureAwait(false);
         }
-
 
         public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter = null)
         {
@@ -153,8 +149,8 @@ namespace CC.Infrastructure.Repositories
             await unitOfWork.GetContext().Database.ExecuteSqlRawAsync(query, parameters).ConfigureAwait(false);
         }
 
-
         #region PrivateMethods
+
         private IQueryable<TEntity> BuildQuery(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -195,9 +191,11 @@ namespace CC.Infrastructure.Repositories
                 throw new ArgumentNullException(nameof(entities), "no se envió una lista de entidades a insertar");
             }
         }
-        #endregion
+
+        #endregion PrivateMethods
 
         #region Dispose
+
         public void Dispose()
         {
             Dispose(true);
@@ -211,7 +209,7 @@ namespace CC.Infrastructure.Repositories
                 unitOfWork.Dispose();
             }
         }
-        #endregion
 
+        #endregion Dispose
     }
 }

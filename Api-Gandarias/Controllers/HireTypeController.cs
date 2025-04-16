@@ -1,9 +1,6 @@
-﻿using CC.Application.Services;
-using CC.Domain.Interfaces.Repositories;
-using CC.Domain.Interfaces.Services;
+﻿using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gandarias.Controllers;

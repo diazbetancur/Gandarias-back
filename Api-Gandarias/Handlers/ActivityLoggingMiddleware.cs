@@ -2,7 +2,6 @@
 using CC.Infrastructure.Configurations;
 using System.IdentityModel.Tokens.Jwt;
 
-
 namespace Gandarias.Handlers;
 
 public class ActivityLoggingMiddleware
@@ -49,7 +48,7 @@ public class ActivityLoggingMiddleware
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in UserActivityLog: {ex.Message}");
-            }           
+            }
         }
         await _next(context);
     }

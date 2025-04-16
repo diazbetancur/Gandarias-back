@@ -2,6 +2,6 @@
 
 namespace CC.Domain.Interfaces.Repositories;
 
-public interface IHireTypeRepository : IERepositoryBase<HireType>
+public interface IShiftTypeRepository : IERepositoryBase<ShiftType>
 {
 }

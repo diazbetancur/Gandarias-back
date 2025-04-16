@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CC.Domain.Helpers
+﻿namespace CC.Domain.Helpers
 {
     public class ActionResponse<T>
     {

@@ -2,7 +2,6 @@
 using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gandarias.Controllers;
@@ -73,7 +72,7 @@ public class WorkAreaController : ControllerBase
     /// <returns></returns>
     [HttpDelete()]
     public async Task<IActionResult> Delete(WorkAreaDto workAreaDto)
-    {      
+    {
         await _workAreaService.DeleteAsync(workAreaDto).ConfigureAwait(false);
         return Ok(workAreaDto);
     }

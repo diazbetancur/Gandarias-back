@@ -1,6 +1,4 @@
 ﻿using CC.Domain.Dtos;
-using CC.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace CC.Domain.Interfaces.Services;
 

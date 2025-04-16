@@ -6,12 +6,10 @@ using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Repositories;
 using CC.Domain.Interfaces.Services;
 using CC.Domain.Services;
-using CC.Infrastructure.EmailServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -63,7 +61,6 @@ namespace CC.Application.Services
                         WasSuccessful = true,
                         Message = $"No se logro crear el usuario, por favor intentelo nuevamente.",
                     };
-
                 }
 
                 return new ActionResponse<User>
@@ -211,7 +208,6 @@ namespace CC.Application.Services
                 //        Message = "Error al eliminar el usuario.",
                 //    };
                 //}
-
             }
             catch (Exception ex)
             {

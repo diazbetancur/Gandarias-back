@@ -1,16 +1,9 @@
-﻿using CC.Application.Services;
-using CC.Domain.Dtos;
-using CC.Domain.Entities;
+﻿using CC.Domain.Dtos;
 using CC.Domain.Interfaces.Services;
-using CC.Infrastructure.EmailServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System.Net;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Gandarias.Controllers
 {

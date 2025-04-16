@@ -2,7 +2,6 @@
 using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gandarias.Controllers;
@@ -26,7 +25,7 @@ public class WorkstationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workstationService.GetAllAsync(x=> x.IsDeleted == false, includeProperties: "WorkArea").ConfigureAwait(false));
+        return Ok(await _workstationService.GetAllAsync(x => x.IsDeleted == false, includeProperties: "WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>

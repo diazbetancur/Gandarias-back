@@ -1,9 +1,7 @@
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using Newtonsoft.Json;
 using System.Web.Http;
-using System.Net.Http;
-using Serilog;
 using ILogger = Serilog.ILogger;
 
 namespace Gandarias.Handlers;

@@ -73,6 +73,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkstationService, WorkstationService>();
         services.AddScoped<IRolePermissionService, RolePermissionService>();
         services.AddScoped<IHireTypeService, HireTypeService>();
+        services.AddScoped<IShiftTypeService, ShiftTypeService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -85,6 +86,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkstationRepository, WorkstationRepository>();
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
         services.AddScoped<IHireTypeRepository, HireTypeRepository>();
+        services.AddScoped<IShiftTypeRepository, ShiftTypeRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

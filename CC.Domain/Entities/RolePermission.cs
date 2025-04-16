@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CC.Domain.Entities;
+﻿namespace CC.Domain.Entities;
 
 public class RolePermission : EntityBase<Guid>
 {

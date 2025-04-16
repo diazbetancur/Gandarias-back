@@ -1,6 +1,6 @@
-using Gandarias.Handlers;
 using CC.Domain.Entities;
 using CC.Infrastructure.Configurations;
+using Gandarias.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;

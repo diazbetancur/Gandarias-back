@@ -44,7 +44,7 @@ namespace CC.Infrastructure.Repositories
                 NickName = userDto.NickName,
                 HireDate = (DateTime)userDto.HireDate,
                 HireTypeId = userDto.HireTypeId,
-                IsDelete= false,
+                IsDelete = false,
                 IsActive = true
             };
 

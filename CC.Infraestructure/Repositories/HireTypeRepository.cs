@@ -1,6 +1,4 @@
-﻿
-
-using CC.Domain.Entities;
+﻿using CC.Domain.Entities;
 using CC.Domain.Interfaces.Repositories;
 
 namespace CC.Infrastructure.Repositories;

@@ -1,6 +1,4 @@
-﻿using CC.Domain.Dtos;
-using CC.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using CC.Domain.Entities;
 
 namespace CC.Domain.Interfaces.Repositories;
 

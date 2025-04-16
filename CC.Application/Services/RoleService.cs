@@ -3,8 +3,6 @@ using CC.Domain.Dtos;
 using CC.Domain.Entities;
 using CC.Domain.Interfaces.Repositories;
 using CC.Domain.Interfaces.Services;
-using Microsoft.AspNetCore.Identity;
-using System.Data;
 
 namespace CC.Application.Services
 {

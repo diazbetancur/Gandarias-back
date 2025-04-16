@@ -1,6 +1,4 @@
-﻿
-
-namespace CC.Domain.Entities;
+﻿namespace CC.Domain.Entities;
 
 public class UserActivityLog : EntityBase<Guid>
 {

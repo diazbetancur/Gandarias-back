@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CC.Domain.Helpers
 {
     public static class Extensions
     {
-
         /// <summary>
         /// Generates a Random Password
         /// respecting the given strength requirements.

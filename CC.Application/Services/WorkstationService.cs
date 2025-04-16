@@ -10,6 +10,7 @@ namespace CC.Application.Services;
 public class WorkstationService : ServiceBase<Workstation, WorkstationDto>, IWorkstationService
 {
     private readonly IWorkstationRepository _repository;
+
     public WorkstationService(IWorkstationRepository repository, IMapper mapper) : base(repository, mapper)
     {
         _repository = repository;

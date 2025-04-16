@@ -20,7 +20,7 @@ public class WorkAreaRepository : ERepositoryBase<WorkArea>, IWorkAreaRepository
         try
         {
             var workArea = await _dataContext.WorkAreas.Include(x => x.workstations).FirstOrDefaultAsync(x => x.Id == entity.Id).ConfigureAwait(false);
-            if(workArea == null)
+            if (workArea == null)
             {
                 return false;
             }
@@ -38,7 +38,7 @@ public class WorkAreaRepository : ERepositoryBase<WorkArea>, IWorkAreaRepository
             return true;
         }
         catch (Exception)
-		{
+        {
             throw new Exception("Error al eliminar WorkArea, por favor contactar al administrador.");
         }
     }

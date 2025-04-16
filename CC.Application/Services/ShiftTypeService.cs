@@ -7,9 +7,9 @@ using CC.Domain.Services;
 
 namespace CC.Application.Services;
 
-public class HireTypeService : ServiceBase<HireType, HireTypeDto>, IHireTypeService
+public class ShiftTypeService : ServiceBase<ShiftType, ShiftTypeDto>, IShiftTypeService
 {
-    public HireTypeService(IHireTypeRepository repository, IMapper mapper) : base(repository, mapper)
+    public ShiftTypeService(IShiftTypeRepository repository, IMapper mapper) : base(repository, mapper)
     {
     }
 }

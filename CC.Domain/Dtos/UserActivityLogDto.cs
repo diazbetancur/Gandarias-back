@@ -1,6 +1,4 @@
-﻿
-
-namespace CC.Domain.Dtos;
+﻿namespace CC.Domain.Dtos;
 
 public class UserActivityLogDto
 {

@@ -8,8 +8,8 @@ public class EntityBase<T>
     /// Id model
     /// </summary>
     [Key]
-    public required T Id { get; set; }
-    
+    public T Id { get; set; }
+
     /// <summary>
     /// Date created
     /// </summary>
