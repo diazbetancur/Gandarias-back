@@ -144,6 +144,7 @@ namespace CC.Infrastructure.Repositories
 
                     var userDto = new UserDto
                     {
+                        Id = user.Id,
                         DNI = user.UserName,
                         Email = user.Email,
                         PhoneNumber = user.PhoneNumber,
