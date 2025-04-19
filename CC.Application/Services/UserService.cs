@@ -235,7 +235,7 @@ namespace CC.Application.Services
             userFind.LastName = userDto.LastName ?? userDto.LastName;
             userFind.Email = userDto.Email ?? userDto.Email;
             userFind.UserName = userDto.DNI ?? userDto.DNI;
-            userFind.PhoneNumber = userDto.PhoneNumber ?? userDto.PhoneNumber;
+            //userFind.PhoneNumber = userDto.PhoneNumber ?? userDto.PhoneNumber;
             userFind.HireTypeId = userDto.HireTypeId;
             userFind.NickName = userDto.NickName;
             userFind.IsActive = (bool)userDto.IsActive;

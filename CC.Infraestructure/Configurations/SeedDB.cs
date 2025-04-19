@@ -64,7 +64,7 @@ public class SeedDB
                 NickName = "Admin",
                 HireDate = DateTime.UtcNow,
                 HireTypeId = _context.HireTypes.FirstOrDefault(x => x.Name == "Tiempo Completo")?.Id,
-                PhoneNumber = "123456789",
+                //PhoneNumber = "123456789",
             };
 
             ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");
@@ -154,7 +154,7 @@ public class SeedDB
                 NickName = "Employee",
                 HireDate = DateTime.UtcNow,
                 HireTypeId = _context.HireTypes.FirstOrDefault(x => x.Name == "Tiempo Completo")?.Id,
-                PhoneNumber = "123456789",
+                //PhoneNumber = "123456789",
             };
 
             ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "Gandarias1.");
