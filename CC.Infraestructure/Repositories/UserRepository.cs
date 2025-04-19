@@ -40,7 +40,7 @@ namespace CC.Infrastructure.Repositories
                 LastName = userDto.LastName,
                 UserName = userDto.DNI,
                 Email = userDto.Email,
-                PhoneNumber = "0",
+                PhoneNumber = userDto.PhoneNumber,
                 NickName = userDto.NickName,
                 HireDate = (DateTime)userDto.HireDate,
                 HireTypeId = userDto.HireTypeId,
