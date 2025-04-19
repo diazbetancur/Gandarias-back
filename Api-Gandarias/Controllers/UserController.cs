@@ -79,8 +79,8 @@ namespace Gandarias.Controllers
         [HttpDelete("{userId}")]
         public async Task<IActionResult> Delete(Guid userId)
         {
-            await _userService.RemoveUserFromRoleAsync(userId).ConfigureAwait(false);
-            return Ok();
+            var result = await _userService.RemoveUserFromRoleAsync(userId).ConfigureAwait(false);
+            return Ok(result);
         }
     }
 }
