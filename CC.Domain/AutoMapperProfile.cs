@@ -16,7 +16,6 @@ namespace CC.Domain
             CreateMap<HireType, HireTypeDto>().ReverseMap();
             CreateMap<UserActivityLog, UserActivityLogDto>().ReverseMap();
             CreateMap<ShiftTypeDto, ShiftType>().ReverseMap();
-            CreateMap<ShiftScheduleDto, ShiftSchedule>().ReverseMap();
         }
     }
 }

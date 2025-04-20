@@ -52,11 +52,6 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<ShiftType> ShiftTypes { get; set; }
 
-        /// <summary>
-        /// ShiftType
-        /// </summary>
-        public DbSet<ShiftSchedule> ShiftSchedules { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -98,10 +93,6 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<ShiftType>().HasKey(c => c.Id);
             modelBuilder.Entity<ShiftType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<ShiftType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            modelBuilder.Entity<ShiftSchedule>().HasKey(c => c.Id);
-            modelBuilder.Entity<ShiftSchedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
-            modelBuilder.Entity<ShiftSchedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

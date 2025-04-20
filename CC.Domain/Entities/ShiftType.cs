@@ -7,5 +7,8 @@ public class ShiftType : EntityBase<Guid>
     public bool IsFlexibleExit { get; set; }
     public ShiftStructureType Structure { get; set; }
     public ShiftSubType? SubType { get; set; }
-    public ICollection<ShiftSchedule> Schedules { get; set; } = new List<ShiftSchedule>();
+    public TimeSpan? Block1Start { get; set; }
+    public TimeSpan? Block1End { get; set; }
+    public TimeSpan? Block2Start { get; set; }
+    public TimeSpan? Block2End { get; set; }
 }
