@@ -52,6 +52,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<ShiftType> ShiftTypes { get; set; }
 
+        /// <summary>
+        /// License
+        /// </summary>
+        public DbSet<License> Licenses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -93,6 +98,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<ShiftType>().HasKey(c => c.Id);
             modelBuilder.Entity<ShiftType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<ShiftType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<License>().HasKey(c => c.Id);
+            modelBuilder.Entity<License>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<License>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);
