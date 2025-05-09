@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CC.Infrastructure.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20250416144645_shiftType")]
-    partial class shiftType
+    [Migration("20250509014501_creationBase")]
+    partial class creationBase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,53 @@ namespace CC.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HireTypes", "Management");
+                });
+
+            modelBuilder.Entity("CC.Domain.Entities.License", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int?>("DaysRequested")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HalfPeriod")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsHalfDay")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Observation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Licenses", "Management");
                 });
 
             modelBuilder.Entity("CC.Domain.Entities.Permission", b =>
@@ -126,7 +173,7 @@ namespace CC.Infrastructure.Migrations
                     b.ToTable("RolePermissions", "Management");
                 });
 
-            modelBuilder.Entity("CC.Domain.Entities.ShiftSchedule", b =>
+            modelBuilder.Entity("CC.Domain.Entities.ShiftType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,28 +197,6 @@ namespace CC.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<Guid>("ShiftTypeId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShiftTypeId");
-
-                    b.ToTable("ShiftSchedules", "Management");
-                });
-
-            modelBuilder.Entity("CC.Domain.Entities.ShiftType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -188,6 +213,9 @@ namespace CC.Infrastructure.Migrations
 
                     b.Property<int?>("SubType")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("finishNextDay")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -306,16 +334,12 @@ namespace CC.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId1")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserActivityLogs", "Management");
                 });
@@ -327,16 +351,15 @@ namespace CC.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<int>("Covertage")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId1")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("WorkstationId")
@@ -344,7 +367,7 @@ namespace CC.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.HasIndex("WorkstationId");
 
@@ -513,6 +536,17 @@ namespace CC.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", "Management");
                 });
 
+            modelBuilder.Entity("CC.Domain.Entities.License", b =>
+                {
+                    b.HasOne("CC.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CC.Domain.Entities.RolePermission", b =>
                 {
                     b.HasOne("CC.Domain.Entities.Permission", "Permission")
@@ -532,17 +566,6 @@ namespace CC.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("CC.Domain.Entities.ShiftSchedule", b =>
-                {
-                    b.HasOne("CC.Domain.Entities.ShiftType", "ShiftType")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ShiftTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ShiftType");
-                });
-
             modelBuilder.Entity("CC.Domain.Entities.User", b =>
                 {
                     b.HasOne("CC.Domain.Entities.HireType", "HireType")
@@ -557,7 +580,7 @@ namespace CC.Infrastructure.Migrations
                 {
                     b.HasOne("CC.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -568,7 +591,7 @@ namespace CC.Infrastructure.Migrations
                 {
                     b.HasOne("CC.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -643,11 +666,6 @@ namespace CC.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CC.Domain.Entities.ShiftType", b =>
-                {
-                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("CC.Domain.Entities.WorkArea", b =>

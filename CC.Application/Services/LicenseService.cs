@@ -26,7 +26,7 @@ public class LicenseService : ServiceBase<License, LicenseDto>, ILicenseService
             HalfPeriod = license.HalfPeriod,
             Observation = license.Observation,
             Reason = license.Reason,
-            UserId = license.UserName,
+            UserId = license.UserId,
             IsHalfDay = license.IsHalfDay,
             IsDeleted = false,
             StartDate = license.StartDate,

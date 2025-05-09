@@ -2,7 +2,7 @@
 
 public class License : EntityBase<Guid>
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
     public virtual User User { get; set; }
     public string Reason { get; set; }
     public DateTime StartDate { get; set; }

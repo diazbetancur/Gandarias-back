@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CC.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class @base : Migration
+    public partial class creationBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,6 +60,29 @@ namespace CC.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ShiftTypes",
+                schema: "Management",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    IsFlexibleExit = table.Column<bool>(type: "boolean", nullable: false),
+                    Structure = table.Column<int>(type: "integer", nullable: false),
+                    SubType = table.Column<int>(type: "integer", nullable: true),
+                    Block1Start = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    Block1End = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    Block2Start = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    Block2End = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    finishNextDay = table.Column<bool>(type: "boolean", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShiftTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkAreas",
                 schema: "Management",
                 columns: table => new
@@ -66,6 +90,7 @@ namespace CC.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Name = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
@@ -105,9 +130,10 @@ namespace CC.Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     LastName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    JobTitle = table.Column<string>(type: "text", nullable: false),
+                    NickName = table.Column<string>(type: "text", nullable: false),
                     HireDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     HireTypeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDelete = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -172,6 +198,7 @@ namespace CC.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Name = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     WorkAreaId = table.Column<Guid>(type: "uuid", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -282,13 +309,41 @@ namespace CC.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Licenses",
+                schema: "Management",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Reason = table.Column<string>(type: "text", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsHalfDay = table.Column<bool>(type: "boolean", nullable: false),
+                    HalfPeriod = table.Column<string>(type: "text", nullable: true),
+                    DaysRequested = table.Column<int>(type: "integer", nullable: true),
+                    Observation = table.Column<string>(type: "text", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Licenses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Licenses_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Management",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserActivityLogs",
                 schema: "Management",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Action = table.Column<string>(type: "text", nullable: false),
                     IpAddress = table.Column<string>(type: "text", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
@@ -297,8 +352,8 @@ namespace CC.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_UserActivityLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserActivityLogs_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_UserActivityLogs_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalSchema: "Management",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -311,17 +366,17 @@ namespace CC.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     WorkstationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Covertage = table.Column<int>(type: "integer", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserWorkstations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserWorkstations_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_UserWorkstations_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalSchema: "Management",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -386,6 +441,12 @@ namespace CC.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Licenses_UserId",
+                schema: "Management",
+                table: "Licenses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
                 schema: "Management",
                 table: "RolePermissions",
@@ -398,16 +459,16 @@ namespace CC.Infrastructure.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserActivityLogs_UserId1",
+                name: "IX_UserActivityLogs_UserId",
                 schema: "Management",
                 table: "UserActivityLogs",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserWorkstations_UserId1",
+                name: "IX_UserWorkstations_UserId",
                 schema: "Management",
                 table: "UserWorkstations",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserWorkstations_WorkstationId",
@@ -446,7 +507,15 @@ namespace CC.Infrastructure.Migrations
                 schema: "Management");
 
             migrationBuilder.DropTable(
+                name: "Licenses",
+                schema: "Management");
+
+            migrationBuilder.DropTable(
                 name: "RolePermissions",
+                schema: "Management");
+
+            migrationBuilder.DropTable(
+                name: "ShiftTypes",
                 schema: "Management");
 
             migrationBuilder.DropTable(

@@ -33,7 +33,7 @@ public class SeedDB
         await ChechEmployeeAsync();
 
         // Solo para crear los usuarios
-        //await fillDataUser();
+        await fillDataUser();
     }
 
     private async Task CheckRolesAsync()

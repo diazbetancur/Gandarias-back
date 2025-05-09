@@ -49,8 +49,15 @@ public class LicenseController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(LicenseDto licenseDto)
     {
-        await _licenseService.AddAsync(licenseDto).ConfigureAwait(false);
-        return Ok(licenseDto);
+        try
+        {
+            await _licenseService.AddAsync(licenseDto).ConfigureAwait(false);
+            return Ok(licenseDto);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     /// <summary>

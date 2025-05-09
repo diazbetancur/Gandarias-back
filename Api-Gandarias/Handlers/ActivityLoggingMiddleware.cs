@@ -33,7 +33,7 @@ public class ActivityLoggingMiddleware
                     {
                         var log = new UserActivityLog
                         {
-                            UserId = GetUserIdFromToken(context),
+                            UserId = new Guid(userId),
                             Action = $"{context.Request.Method} {context.Request.Path}",
                             IpAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
                             DateCreated = DateTime.UtcNow,
