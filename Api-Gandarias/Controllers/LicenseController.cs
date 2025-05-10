@@ -27,7 +27,7 @@ public class LicenseController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _licenseService.GetAllAsync(x => x.IsDeleted == false).ConfigureAwait(false));
+        return Ok(await _licenseService.GetAllAsync(x => x.IsDeleted == false, includeProperties: "User").ConfigureAwait(false));
     }
 
     /// <summary>

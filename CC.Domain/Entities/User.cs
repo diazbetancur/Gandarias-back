@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CC.Domain.Entities;
 
@@ -13,4 +14,7 @@ public class User : IdentityUser<Guid>
     public virtual HireType? HireType { get; set; }
     public bool IsDelete { get; set; }
     public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
+
+    [NotMapped]
+    public string FullName => $"{FirstName} {LastName}".Trim();
 }
