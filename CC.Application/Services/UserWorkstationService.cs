@@ -9,7 +9,7 @@ namespace CC.Application.Services;
 
 public class UserWorkstationService : ServiceBase<UserWorkstation, UserWorkstationDto>, IUserWorkstationService
 {
-    public UserWorkstationService(IERepositoryBase<UserWorkstation> repository, IMapper mapper) : base(repository, mapper)
+    public UserWorkstationService(IUserWorkstationRepository repository, IMapper mapper) : base(repository, mapper)
     {
     }
 }
