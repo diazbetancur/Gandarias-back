@@ -11,5 +11,6 @@ public class ShiftType : EntityBase<Guid>
     public TimeSpan? Block1End { get; set; }
     public TimeSpan? Block2Start { get; set; }
     public TimeSpan? Block2End { get; set; }
-    public bool finishNextDay { get; set; } = false;
+    public bool finishNextDay { get; set; }
+
 }

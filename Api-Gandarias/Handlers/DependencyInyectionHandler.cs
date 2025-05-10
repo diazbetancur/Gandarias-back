@@ -75,6 +75,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IHireTypeService, HireTypeService>();
         services.AddScoped<IShiftTypeService, ShiftTypeService>();
         services.AddScoped<ILicenseService, LicenseService>();
+        services.AddScoped<IHybridWorkstationService, HybridWorkstationService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -89,6 +90,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IHireTypeRepository, HireTypeRepository>();
         services.AddScoped<IShiftTypeRepository, ShiftTypeRepository>();
         services.AddScoped<ILicenseRepository, LicenseRepository>();
+        services.AddScoped<IHybridWorkstationRepository, HybridWorkstationRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

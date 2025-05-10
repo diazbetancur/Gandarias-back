@@ -7,5 +7,7 @@ public enum Permissions
     UserWorkstation,
     WorkArea,
     WorkSchedule,
-    ShiftManagement
+    ShiftManagement,
+    License,
+    HybridWorkstation
 }
