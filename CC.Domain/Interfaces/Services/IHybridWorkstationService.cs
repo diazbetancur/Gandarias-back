@@ -5,4 +5,5 @@ namespace CC.Domain.Interfaces.Services;
 
 public interface IHybridWorkstationService : IServiceBase<HybridWorkstation, HybridWorkstationDto>
 {
+    Task<HybridWorkstation> AddAsync(HybridWorkstationDto entity);
 }
