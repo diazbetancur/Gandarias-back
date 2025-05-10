@@ -12,4 +12,5 @@ public class User : IdentityUser<Guid>
     public Guid? HireTypeId { get; set; }
     public virtual HireType? HireType { get; set; }
     public bool IsDelete { get; set; }
+    public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 }

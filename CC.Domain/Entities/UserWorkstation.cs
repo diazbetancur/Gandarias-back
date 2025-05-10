@@ -6,5 +6,6 @@ public class UserWorkstation : EntityBase<Guid>
     public virtual User User { get; set; }
     public Guid WorkstationId { get; set; }
     public virtual Workstation Workstation { get; set; }
-    public int Covertage { get; set; }
+    public int Coverage { get; set; }
+    public bool IsDelete { get; set; } = false;
 }

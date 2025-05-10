@@ -7,4 +7,5 @@ public class Workstation : EntityBase<Guid>
     public bool IsDeleted { get; set; } = false;
     public Guid WorkAreaId { get; set; }
     public virtual WorkArea WorkArea { get; set; }
+    public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 }
