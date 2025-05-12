@@ -9,6 +9,8 @@ public class UserRestrictionShiftDto
     public Guid UserId { get; set; }
     public string? UserFullName { get; set; }
 
-    public Guid? ShiftTypeId { get; set; }
-    public string ShiftTypeName { get; set; }
+    public Guid ShiftTypeId { get; set; }
+    public string? ShiftTypeName { get; set; }
+
+    public bool IsDelete { get; set; }
 }
