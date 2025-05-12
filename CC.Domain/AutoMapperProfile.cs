@@ -19,6 +19,7 @@ namespace CC.Domain
             CreateMap<License, LicenseDto>().ReverseMap();
             CreateMap<UserWorkstation, UserWorkstationDto>().ReverseMap();
             CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap();
+            CreateMap<UserRestrictionShift, UserRestrictionShiftDto>().ReverseMap();
         }
     }
 }
