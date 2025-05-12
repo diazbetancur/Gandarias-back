@@ -15,7 +15,7 @@ public class LicenseRepository : ERepositoryBase<License>, ILicenseRepository
 
     public async Task<License> CreateAsync(License license)
     {
-        var add = await _dataContext.Licenses.AddAsync(license).ConfigureAwait(false);
+        var add = await _dataContext.AddAsync(license).ConfigureAwait(false);
         _dataContext.Commit();
         return add.Entity;
     }
