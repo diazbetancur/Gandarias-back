@@ -62,6 +62,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<HybridWorkstation> HybridWorkstations { get; set; }
 
+        /// <summary>
+        /// License
+        /// </summary>
+        public DbSet<UserRestrictionShift> UserRestrictionShifts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -111,6 +116,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<HybridWorkstation>().HasKey(c => c.Id);
             modelBuilder.Entity<HybridWorkstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<HybridWorkstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<UserRestrictionShift>().HasKey(c => c.Id);
+            modelBuilder.Entity<UserRestrictionShift>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<UserRestrictionShift>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

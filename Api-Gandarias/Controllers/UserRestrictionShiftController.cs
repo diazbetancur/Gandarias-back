@@ -28,7 +28,7 @@ public class UserRestrictionShiftController : ControllerBase
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _userRestrictionShiftService
-            .GetAllAsync(x => x.IsDelete == false, includeProperties: "User, ShiftType")
+            .GetAllAsync(x => x.IsDelete == false, includeProperties: "User,ShiftType")
             .ConfigureAwait(false));
     }
 
