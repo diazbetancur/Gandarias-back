@@ -51,8 +51,15 @@ public class UserRestrictionShiftController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(UserRestrictionShiftDto userRestrictionShiftDto)
     {
-        await _userRestrictionShiftService.AddAsync(userRestrictionShiftDto).ConfigureAwait(false);
-        return Ok(userRestrictionShiftDto);
+        try
+        {
+            await _userRestrictionShiftService.AddAsync(userRestrictionShiftDto).ConfigureAwait(false);
+            return Ok(userRestrictionShiftDto);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     /// <summary>
