@@ -44,6 +44,9 @@ namespace CC.Application.Services
                     existingUser.LastName = user.LastName;
                     existingUser.NickName = user.NickName;
                     existingUser.IsActive = true;
+                    existingUser.LawApply = user.LawApply;
+                    existingUser.HiredHours = user.HiredHours;
+                    existingUser.ComplementHours = user.ComplementHours;
 
                     var updateResult = await _userRepository.UpdateUserAsync(existingUser);
 

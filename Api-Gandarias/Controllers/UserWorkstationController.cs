@@ -40,6 +40,17 @@ public class UserWorkstationController : ControllerBase
     }
 
     /// <summary>
+    /// GET api/UserWorkstation/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("GetByUserId/{id}")]
+    public async Task<IActionResult> GetByUserId(Guid id)
+    {
+        return Ok(await _userWorkstationService.GetAllAsync(x => x.UserId == id && x.IsDelete == false).ConfigureAwait(false));
+    }
+
+    /// <summary>
     /// POST api/UserWorkstation
     /// </summary>
     /// <param name="UserWorkstationDto"></param>

@@ -13,6 +13,9 @@ public class User : IdentityUser<Guid>
     public Guid? HireTypeId { get; set; }
     public virtual HireType? HireType { get; set; }
     public bool IsDelete { get; set; }
+    public int HiredHours { get; set; } = 0;
+    public bool ComplementHours { get; set; } = true;
+    public bool LawApply { get; set; } = false;
     public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 
     [NotMapped]

@@ -15,4 +15,7 @@ public class UserDto
     public DateTime? HireDate { get; set; }
     public Guid? HireTypeId { get; set; }
     public string? HireTypeName { get; set; }
+    public int HiredHours { get; set; }
+    public bool ComplementHours { get; set; }
+    public bool LawApply { get; set; }
 }
