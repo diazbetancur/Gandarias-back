@@ -4,7 +4,7 @@ public class UserRestrictionShift : EntityBase<Guid>
 {
     public string Observation { get; set; }
     public bool IsDelete { get; set; }
-    public bool IsRestricted { get; set; }
+    public bool Work { get; set; }
 
     public Guid UserId { get; set; }
     public virtual User User { get; set; }

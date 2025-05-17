@@ -56,9 +56,18 @@ public class UserWorkstationController : ControllerBase
     /// <param name="UserWorkstationDto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Post(UserWorkstationDto userWorkstationDto)
+    public async Task<IActionResult> Post(AddUserWorkstationDto userWorkstationDto)
     {
-        await _userWorkstationService.AddAsync(userWorkstationDto).ConfigureAwait(false);
+        foreach (var item in userWorkstationDto.workStations)
+        {
+            await _userWorkstationService.AddAsync(new UserWorkstationDto
+            {
+                Coverage = item.Coverage,
+                UserId = userWorkstationDto.UserId,
+                WorkstationId = item.Id,
+                IsDelete = false
+            }).ConfigureAwait(false);
+        }
         return Ok(userWorkstationDto);
     }
 
