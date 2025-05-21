@@ -1,5 +1,7 @@
 ﻿using CC.Domain.Dtos;
 using CC.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +9,7 @@ namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class EmployeeScheduleRestrictionController : ControllerBase
 {
     private readonly IEmployeeScheduleRestrictionService _employeeScheduleRestriction;

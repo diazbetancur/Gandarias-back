@@ -10,5 +10,7 @@ public enum Permissions
     ShiftManagement,
     License,
     HybridWorkstation,
-    UserRestrictionShift
+    UserRestrictionShift,
+    AbsenteeismType,
+    UserAbsenteeism
 }

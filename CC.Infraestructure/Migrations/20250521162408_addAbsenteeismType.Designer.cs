@@ -3,6 +3,7 @@ using System;
 using CC.Infrastructure.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CC.Infrastructure.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20250521162408_addAbsenteeismType")]
+    partial class addAbsenteeismType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -426,42 +429,6 @@ namespace CC.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", "Management");
                 });
 
-            modelBuilder.Entity("CC.Domain.Entities.UserAbsenteeism", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid>("AbsenteeismTypeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Observation")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AbsenteeismTypeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserAbsenteeisms", "Management");
-                });
-
             modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -795,25 +762,6 @@ namespace CC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("HireType");
-                });
-
-            modelBuilder.Entity("CC.Domain.Entities.UserAbsenteeism", b =>
-                {
-                    b.HasOne("CC.Domain.Entities.AbsenteeismType", "AbsenteeismType")
-                        .WithMany()
-                        .HasForeignKey("AbsenteeismTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CC.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AbsenteeismType");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CC.Domain.Entities.UserActivityLog", b =>

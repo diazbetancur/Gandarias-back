@@ -62,6 +62,16 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<EmployeeScheduleRestriction> EmployeeScheduleRestrictions { get; set; }
 
+        /// <summary>
+        /// AbsenteeismType
+        /// </summary>
+        public DbSet<AbsenteeismType> AbsenteeismTypes { get; set; }
+
+        /// <summary>
+        /// UserAbsenteeism
+        /// </summary>
+        public DbSet<UserAbsenteeism> UserAbsenteeisms { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -127,6 +137,14 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<EmployeeScheduleRestriction>().HasKey(c => c.Id);
             modelBuilder.Entity<EmployeeScheduleRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<EmployeeScheduleRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<AbsenteeismType>().HasKey(c => c.Id);
+            modelBuilder.Entity<AbsenteeismType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<AbsenteeismType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<UserAbsenteeism>().HasKey(c => c.Id);
+            modelBuilder.Entity<UserAbsenteeism>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<UserAbsenteeism>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // TODO: Revisar si es necesario esto
 
