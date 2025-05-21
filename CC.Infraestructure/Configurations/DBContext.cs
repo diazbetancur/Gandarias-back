@@ -53,19 +53,26 @@ namespace CC.Infrastructure.Configurations
         public DbSet<ShiftType> ShiftTypes { get; set; }
 
         /// <summary>
-        /// License
-        /// </summary>
-        public DbSet<License> Licenses { get; set; }
-
-        /// <summary>
-        /// License
+        /// HybridWorkstation
         /// </summary>
         public DbSet<HybridWorkstation> HybridWorkstations { get; set; }
+
+        /// <summary>
+        /// EmployeeScheduleRestriction
+        /// </summary>
+        public DbSet<EmployeeScheduleRestriction> EmployeeScheduleRestrictions { get; set; }
+
+        // TODO: Revisar si es necesario esto
 
         /// <summary>
         /// License
         /// </summary>
         public DbSet<UserRestrictionShift> UserRestrictionShifts { get; set; }
+
+        /// <summary>
+        /// License
+        /// </summary>
+        public DbSet<License> Licenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -109,13 +116,23 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<ShiftType>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<ShiftType>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            modelBuilder.Entity<License>().HasKey(c => c.Id);
-            modelBuilder.Entity<License>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
-            modelBuilder.Entity<License>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            modelBuilder.Entity<HybridWorkstation>().HasKey(c => c.Id);
+            modelBuilder.Entity<HybridWorkstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<HybridWorkstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<HybridWorkstation>().HasKey(c => c.Id);
             modelBuilder.Entity<HybridWorkstation>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<HybridWorkstation>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<EmployeeScheduleRestriction>().HasKey(c => c.Id);
+            modelBuilder.Entity<EmployeeScheduleRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<EmployeeScheduleRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // TODO: Revisar si es necesario esto
+
+            modelBuilder.Entity<License>().HasKey(c => c.Id);
+            modelBuilder.Entity<License>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<License>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<UserRestrictionShift>().HasKey(c => c.Id);
             modelBuilder.Entity<UserRestrictionShift>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");

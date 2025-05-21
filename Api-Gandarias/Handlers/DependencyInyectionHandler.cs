@@ -78,6 +78,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IHybridWorkstationService, HybridWorkstationService>();
         services.AddScoped<IUserWorkstationService, UserWorkstationService>();
         services.AddScoped<IUserRestrictionShiftService, UserRestrictionShiftService>();
+        services.AddScoped<IEmployeeScheduleRestrictionService, EmployeeScheduleRestrictionService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -95,6 +96,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IHybridWorkstationRepository, HybridWorkstationRepository>();
         services.AddScoped<IUserWorkstationRepository, UserWorkstationRepository>();
         services.AddScoped<IUserRestrictionShiftRepository, UserRestrictionShiftRepository>();
+        services.AddScoped<IEmployeeScheduleRestrictionRepository, EmployeeScheduleRestrictionRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

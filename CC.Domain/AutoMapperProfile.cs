@@ -20,6 +20,7 @@ namespace CC.Domain
             CreateMap<UserWorkstation, UserWorkstationDto>().ReverseMap();
             CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap();
             CreateMap<UserRestrictionShift, UserRestrictionShiftDto>().ReverseMap();
+            CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();
         }
     }
 }
