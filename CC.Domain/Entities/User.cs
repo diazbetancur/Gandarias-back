@@ -16,6 +16,7 @@ public class User : IdentityUser<Guid>
     public int HiredHours { get; set; } = 0;
     public bool ComplementHours { get; set; } = true;
     public bool LawApply { get; set; } = false;
+    public bool ExtraHours { get; set; } = false;
     public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 
     [NotMapped]

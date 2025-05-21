@@ -22,7 +22,7 @@ public class UserRestrictionShiftRepository : ERepositoryBase<UserRestrictionShi
             var data = new UserRestrictionShift
             {
                 IsDelete = false,
-                IsRestricted = entity.IsRestricted,
+                //IsRestricted = entity.IsRestricted,
                 Observation = entity.Observation,
                 ShiftTypeId = entity.ShiftTypeId,
                 UserId = entity.UserId,

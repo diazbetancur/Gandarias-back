@@ -13,4 +13,5 @@ public class UserWorkstationDto
     public int Coverage { get; set; }
 
     public bool IsDelete { get; set; } = false;
+    public int Preference { get; set; }
 }

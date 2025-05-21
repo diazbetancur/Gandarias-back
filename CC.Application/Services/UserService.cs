@@ -47,6 +47,7 @@ namespace CC.Application.Services
                     existingUser.LawApply = user.LawApply;
                     existingUser.HiredHours = user.HiredHours;
                     existingUser.ComplementHours = user.ComplementHours;
+                    existingUser.ExtraHours = user.ExtraHours;
 
                     var updateResult = await _userRepository.UpdateUserAsync(existingUser);
 
@@ -242,6 +243,11 @@ namespace CC.Application.Services
             userFind.HireTypeId = userDto.HireTypeId;
             userFind.NickName = userDto.NickName;
             userFind.IsActive = (bool)userDto.IsActive;
+            userFind.LawApply = userDto.LawApply;
+            userFind.HiredHours = userDto.HiredHours;
+            userFind.ComplementHours = userDto.ComplementHours;
+            userFind.ExtraHours = userDto.ExtraHours;
+
             if (userDto.HireDate != null)
                 userFind.HireDate = (DateTime)(userDto.HireDate != null ? userDto.HireDate : DateTime.UtcNow);
 

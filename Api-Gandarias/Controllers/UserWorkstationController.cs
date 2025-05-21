@@ -65,7 +65,8 @@ public class UserWorkstationController : ControllerBase
                 Coverage = item.Coverage,
                 UserId = userWorkstationDto.UserId,
                 WorkstationId = item.Id,
-                IsDelete = false
+                IsDelete = false,
+                Preference = item.Preference,
             }).ConfigureAwait(false);
         }
         return Ok(userWorkstationDto);

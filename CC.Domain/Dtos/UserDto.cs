@@ -18,4 +18,5 @@ public class UserDto
     public int HiredHours { get; set; }
     public bool ComplementHours { get; set; }
     public bool LawApply { get; set; }
+    public bool ExtraHours { get; set; }
 }
