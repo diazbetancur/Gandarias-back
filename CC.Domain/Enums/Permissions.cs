@@ -12,5 +12,6 @@ public enum Permissions
     HybridWorkstation,
     UserRestrictionShift,
     AbsenteeismType,
-    UserAbsenteeism
+    UserAbsenteeism,
+    EmployeeScheduleException
 }

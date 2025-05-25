@@ -23,6 +23,7 @@ namespace CC.Domain
             CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();
             CreateMap<AbsenteeismType, AbsenteeismTypeDto>().ReverseMap();
             CreateMap<UserAbsenteeism, UserAbsenteeismDto>().ReverseMap();
+            CreateMap<EmployeeScheduleException, EmployeeScheduleExceptionDto>().ReverseMap();
         }
     }
 }

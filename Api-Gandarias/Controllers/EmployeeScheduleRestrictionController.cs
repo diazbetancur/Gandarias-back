@@ -80,7 +80,7 @@ public class EmployeeScheduleRestrictionController : ControllerBase
     /// <summary>
     /// DELETE api/EmployeeScheduleRestriction/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
-    /// <param name="UserWorkstationDto"></param>
+    /// <param name="EmployeeScheduleRestrictionDto"></param>
     /// <returns></returns>
     [HttpDelete()]
     public async Task<IActionResult> Delete(EmployeeScheduleRestrictionDto employeeScheduleRestrictionDto)

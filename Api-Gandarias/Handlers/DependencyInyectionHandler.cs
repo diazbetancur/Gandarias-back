@@ -81,6 +81,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IEmployeeScheduleRestrictionService, EmployeeScheduleRestrictionService>();
         services.AddScoped<IAbsenteeismTypeService, AbsenteeismTypeService>();
         services.AddScoped<IUserAbsenteeismService, UserAbsenteeismService>();
+        services.AddScoped<IEmployeeScheduleExceptionService, EmployeeScheduleExceptionService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -101,6 +102,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IEmployeeScheduleRestrictionRepository, EmployeeScheduleRestrictionRepository>();
         services.AddScoped<IAbsenteeismTypeRepository, AbsenteeismTypeRepository>();
         services.AddScoped<IUserAbsenteeismRepository, UserAbsenteeismRepository>();
+        services.AddScoped<IEmployeeScheduleExceptionRepository, EmployeeScheduleExceptionRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

@@ -72,6 +72,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<UserAbsenteeism> UserAbsenteeisms { get; set; }
 
+        /// <summary>
+        /// EmployeeScheduleException
+        /// </summary>
+        public DbSet<EmployeeScheduleException> EmployeeScheduleExceptions { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -146,6 +151,9 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<UserAbsenteeism>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<UserAbsenteeism>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+            modelBuilder.Entity<EmployeeScheduleException>().HasKey(c => c.Id);
+            modelBuilder.Entity<EmployeeScheduleException>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<EmployeeScheduleException>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<License>().HasKey(c => c.Id);
