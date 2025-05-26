@@ -8,6 +8,7 @@ namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserWorkstationController : ControllerBase
 {
     private readonly IUserWorkstationService _userWorkstationService;
