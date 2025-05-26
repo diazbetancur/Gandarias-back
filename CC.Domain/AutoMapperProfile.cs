@@ -17,7 +17,8 @@ namespace CC.Domain
             CreateMap<UserActivityLog, UserActivityLogDto>().ReverseMap();
             CreateMap<ShiftTypeDto, ShiftType>().ReverseMap();
             CreateMap<License, LicenseDto>().ReverseMap();
-            CreateMap<UserWorkstation, UserWorkstationDto>().ReverseMap();
+            CreateMap<UserWorkstation, UserWorkstationDto>().ReverseMap().ForMember(dest => dest.Workstation, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore()); ;
             CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap();
             CreateMap<UserRestrictionShift, UserRestrictionShiftDto>().ReverseMap();
             CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();

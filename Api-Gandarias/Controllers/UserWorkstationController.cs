@@ -8,7 +8,6 @@ namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserWorkstationController : ControllerBase
 {
     private readonly IUserWorkstationService _userWorkstationService;
@@ -69,6 +68,7 @@ public class UserWorkstationController : ControllerBase
                 Preference = item.Preference,
             }).ConfigureAwait(false);
         }
+
         return Ok(userWorkstationDto);
     }
 
