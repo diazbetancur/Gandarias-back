@@ -3,6 +3,7 @@ using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gandarias.Controllers;
@@ -57,24 +58,21 @@ public class EmployeeScheduleRestrictionController : ControllerBase
     /// <param name="EmployeeScheduleRestrictionDto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Post(EmployeeScheduleRestrictionDto employeeScheduleRestrictionDto)
+    public async Task<IActionResult> Post(List<EmployeeScheduleRestrictionDto> employeeScheduleRestrictionDto)
     {
-        await _employeeScheduleRestriction.AddAsync(employeeScheduleRestrictionDto).ConfigureAwait(false);
-        return Ok(employeeScheduleRestrictionDto);
-    }
+        foreach (var item in employeeScheduleRestrictionDto)
+        {
+            if (string.IsNullOrEmpty(item.Id.ToString().Trim()))
+            {
+                await _employeeScheduleRestriction.AddAsync(item).ConfigureAwait(false);
+            }
+            else
+            {
+                await _employeeScheduleRestriction.UpdateAsync(item).ConfigureAwait(false);
+            }
+        }
 
-    /// <summary>
-    /// PUT api/EmployeeScheduleRestriction/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="EmployeeScheduleRestrictionDto"></param>
-    /// <returns></returns>
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, EmployeeScheduleRestrictionDto employeeScheduleRestrictionDto)
-    {
-        employeeScheduleRestrictionDto.Id = id;
-        await _employeeScheduleRestriction.UpdateAsync(employeeScheduleRestrictionDto).ConfigureAwait(false);
-        return Ok(employeeScheduleRestrictionDto);
+        return Ok();
     }
 
     /// <summary>
