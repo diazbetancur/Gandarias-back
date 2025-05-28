@@ -8,5 +8,5 @@ public class UserWorkstation : EntityBase<Guid>
     public virtual Workstation Workstation { get; set; }
     public int Coverage { get; set; }
     public bool IsDelete { get; set; } = false;
-    public int Preference { get; set; };
+    public int Preference { get; set; }
 }
