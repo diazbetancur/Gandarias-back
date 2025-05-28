@@ -9,7 +9,7 @@ public class EmployeeScheduleRestrictionDto
 
     public DayOfWeek DayOfWeek { get; set; }
 
-    public RestrictionType RestrictionType { get; set; }
+    public String RestrictionType { get; set; }
 
     public TimeSpan? AvailableFrom { get; set; }
     public TimeSpan? AvailableUntil { get; set; }
