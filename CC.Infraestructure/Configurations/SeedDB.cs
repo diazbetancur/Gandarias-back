@@ -31,6 +31,7 @@ public class SeedDB
         await CheckRolePermissionAdminAsync();
         await CheckRolePermissionEmployeeAsync();
         await ChechEmployeeAsync();
+        await CheckLawRestrictions();
 
         // Solo para crear los usuarios
         //await fillDataUser();
@@ -178,6 +179,19 @@ public class SeedDB
                 new () { Name = "Tiempo Completo", Id = Guid.NewGuid() },
                 new () { Name = "Tiempo Parcial", Id = Guid.NewGuid() },
                 new () { Name = "Temporal", Id = Guid.NewGuid() },
+            });
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task CheckLawRestrictions()
+    {
+        if (!_context.LawRestrictions.Any())
+        {
+            await _context.LawRestrictions.AddRangeAsync(new List<LawRestriction>
+            {
+                new () { Id = Guid.NewGuid(), Description = "Horas maxima de trabajo por dia", CantHours = 12,  DateCreated = DateTime.UtcNow },
+                new () { Id = Guid.NewGuid(), Description = "Horas minima entre jornadas", CantHours = 6, DateCreated = DateTime.UtcNow },
             });
             await _context.SaveChangesAsync();
         }

@@ -13,5 +13,6 @@ public enum Permissions
     UserRestrictionShift,
     AbsenteeismType,
     UserAbsenteeism,
-    EmployeeScheduleException
+    EmployeeScheduleException,
+    LawRestriction
 }

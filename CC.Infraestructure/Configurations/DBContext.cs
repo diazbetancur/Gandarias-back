@@ -77,6 +77,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<EmployeeScheduleException> EmployeeScheduleExceptions { get; set; }
 
+        /// <summary>
+        /// LawRestriction
+        /// </summary>
+        public DbSet<LawRestriction> LawRestrictions { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -154,6 +159,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<EmployeeScheduleException>().HasKey(c => c.Id);
             modelBuilder.Entity<EmployeeScheduleException>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<EmployeeScheduleException>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<LawRestriction>().HasKey(c => c.Id);
+            modelBuilder.Entity<LawRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<LawRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<License>().HasKey(c => c.Id);
