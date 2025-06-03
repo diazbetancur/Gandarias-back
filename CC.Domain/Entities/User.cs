@@ -17,6 +17,7 @@ public class User : IdentityUser<Guid>
     public bool ComplementHours { get; set; } = true;
     public bool LawApply { get; set; } = false;
     public bool ExtraHours { get; set; } = false;
+    public int CantPartTimeSchedule { get; set; } = 0;
     public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 
     [NotMapped]
