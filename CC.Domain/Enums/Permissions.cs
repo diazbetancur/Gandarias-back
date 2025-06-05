@@ -14,5 +14,6 @@ public enum Permissions
     AbsenteeismType,
     UserAbsenteeism,
     EmployeeScheduleException,
-    LawRestriction
+    LawRestriction,
+    WorkstationDemandTemplate
 }

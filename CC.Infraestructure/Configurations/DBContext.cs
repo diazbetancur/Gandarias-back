@@ -82,6 +82,16 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<LawRestriction> LawRestrictions { get; set; }
 
+        /// <summary>
+        /// WorkstationDemandTemplate
+        /// </summary>
+        public DbSet<WorkstationDemandTemplate> WorkstationDemandTemplates { get; set; }
+
+        /// <summary>
+        /// WorkstationDemand
+        /// </summary>
+        public DbSet<WorkstationDemand> WorkstationDemands { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -163,6 +173,14 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<LawRestriction>().HasKey(c => c.Id);
             modelBuilder.Entity<LawRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<LawRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<WorkstationDemandTemplate>().HasKey(c => c.Id);
+            modelBuilder.Entity<WorkstationDemandTemplate>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<WorkstationDemandTemplate>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<WorkstationDemand>().HasKey(c => c.Id);
+            modelBuilder.Entity<WorkstationDemand>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<WorkstationDemand>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<License>().HasKey(c => c.Id);
