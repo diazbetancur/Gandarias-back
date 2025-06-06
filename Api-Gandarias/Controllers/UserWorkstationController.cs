@@ -60,14 +60,29 @@ public class UserWorkstationController : ControllerBase
     {
         foreach (var item in userWorkstationDto.workStations)
         {
-            await _userWorkstationService.AddAsync(new UserWorkstationDto
+            if (item.Id == null)
             {
-                Coverage = item.Coverage,
-                UserId = userWorkstationDto.UserId,
-                WorkstationId = item.Id,
-                IsDelete = false,
-                Preference = item.Preference,
-            }).ConfigureAwait(false);
+                await _userWorkstationService.AddAsync(new UserWorkstationDto
+                {
+                    Coverage = item.Coverage,
+                    UserId = userWorkstationDto.UserId,
+                    WorkstationId = item.WorkstationId,
+                    IsDelete = false,
+                    Preference = item.Preference,
+                }).ConfigureAwait(false);
+            }
+            else
+            {
+                await _userWorkstationService.UpdateAsync(new UserWorkstationDto
+                {
+                    Id = item.Id,
+                    Coverage = item.Coverage,
+                    UserId = userWorkstationDto.UserId,
+                    WorkstationId = item.WorkstationId,
+                    IsDelete = false,
+                    Preference = item.Preference,
+                }).ConfigureAwait(false);
+            }
         }
 
         return Ok(userWorkstationDto);
