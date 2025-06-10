@@ -36,8 +36,8 @@ public class LawRestrictionController : ControllerBase
     /// </summary>
     /// <param name="LawRestrictionDto"></param>
     /// <returns></returns>
-    [HttpPost]
-    public async Task<IActionResult> Post(List<LawRestrictionDto> lawRestrictionDto)
+    [HttpPut]
+    public async Task<IActionResult> Put(List<LawRestrictionDto> lawRestrictionDto)
     {
         try
         {
