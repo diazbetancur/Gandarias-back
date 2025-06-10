@@ -8,7 +8,7 @@ public class AddUserWorkstationDto
 
 public class WorkStationUserAddDto
 {
-    public Guid? Id { get; set; }
+    public string? Id { get; set; }
     public int Coverage { get; set; }
     public int Preference { get; set; }
     public Guid WorkstationId { get; set; }

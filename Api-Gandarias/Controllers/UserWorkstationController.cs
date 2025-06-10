@@ -60,7 +60,7 @@ public class UserWorkstationController : ControllerBase
     {
         foreach (var item in userWorkstationDto.workStations)
         {
-            if (item.Id == null || item.Id == new Guid("00000000-0000-0000-0000-000000000000"))
+            if (item.Id == null)
             {
                 await _userWorkstationService.AddAsync(new UserWorkstationDto
                 {
@@ -75,7 +75,7 @@ public class UserWorkstationController : ControllerBase
             {
                 await _userWorkstationService.UpdateAsync(new UserWorkstationDto
                 {
-                    Id = item.Id,
+                    Id = new Guid(item.Id),
                     Coverage = item.Coverage,
                     UserId = userWorkstationDto.UserId,
                     WorkstationId = item.WorkstationId,
