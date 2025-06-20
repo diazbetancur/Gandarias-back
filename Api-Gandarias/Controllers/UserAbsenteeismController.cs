@@ -59,6 +59,14 @@ public class UserAbsenteeismController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(UserAbsenteeismDto userAbsenteeismDto)
     {
+        var existingAbsenteeism = await _userAbsenteeismService.GetAllAsync(
+            x => x.UserId == userAbsenteeismDto.UserId &&
+                 x.StartDate <= userAbsenteeismDto.EndDate &&
+                 x.EndDate >= userAbsenteeismDto.StartDate).ConfigureAwait(false);
+        if (existingAbsenteeism.Any())
+        {
+            return BadRequest("Ya existe una novedad para el periodo seleccionado..");
+        }
         await _userAbsenteeismService.AddAsync(userAbsenteeismDto).ConfigureAwait(false);
         return Ok(userAbsenteeismDto);
     }
