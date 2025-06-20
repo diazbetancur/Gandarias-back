@@ -190,8 +190,9 @@ public class SeedDB
         {
             await _context.LawRestrictions.AddRangeAsync(new List<LawRestriction>
             {
-                new () { Id = Guid.NewGuid(), Description = "Horas maxima de trabajo por dia", CantHours = 12,  DateCreated = DateTime.UtcNow },
-                new () { Id = Guid.NewGuid(), Description = "Horas minima entre jornadas", CantHours = 6, DateCreated = DateTime.UtcNow },
+                new () { Id = Guid.NewGuid(), Description = "Horas maximas de trabajo por dia", CantHours = 12,  DateCreated = DateTime.UtcNow },
+                new () { Id = Guid.NewGuid(), Description = "Horas minimas entre jornadas", CantHours = 6, DateCreated = DateTime.UtcNow },
+                new () { Id = Guid.NewGuid(), Description = "Horas minimas entre bloques de descanso", CantHours = 4, DateCreated = DateTime.UtcNow },
             });
             await _context.SaveChangesAsync();
         }

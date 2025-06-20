@@ -66,7 +66,7 @@ public class UserAbsenteeismController : ControllerBase
         ).ConfigureAwait(false);
         if (existingAbsenteeism.Any())
         {
-            return BadRequest("Ya existe una novedad para el periodo seleccionado..");
+            return BadRequest("Ya existe una novedad para el periodo seleccionado.");
         }
         await _userAbsenteeismService.AddAsync(userAbsenteeismDto).ConfigureAwait(false);
         return Ok(userAbsenteeismDto);
@@ -83,13 +83,13 @@ public class UserAbsenteeismController : ControllerBase
     {
         userAbsenteeismDto.Id = id;
         var existingAbsenteeism = await _userAbsenteeismService.GetAllAsync(
-    x => x.UserId == userAbsenteeismDto.UserId &&
-         (x.EndDate ?? DateTime.MaxValue) >= userAbsenteeismDto.StartDate &&
-         x.StartDate <= (userAbsenteeismDto.EndDate ?? DateTime.MaxValue)
-).ConfigureAwait(false);
+            x => x.UserId == userAbsenteeismDto.UserId &&
+                 (x.EndDate ?? DateTime.MaxValue) >= userAbsenteeismDto.StartDate &&
+                 x.StartDate <= (userAbsenteeismDto.EndDate ?? DateTime.MaxValue)
+        ).ConfigureAwait(false);
         if (existingAbsenteeism.Any())
         {
-            return BadRequest("Ya existe una novedad para el periodo seleccionado..");
+            return BadRequest("Ya existe una novedad para el periodo seleccionado.");
         }
         await _userAbsenteeismService.UpdateAsync(userAbsenteeismDto).ConfigureAwait(false);
         return Ok(userAbsenteeismDto);
