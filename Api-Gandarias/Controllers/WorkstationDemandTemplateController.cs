@@ -52,7 +52,20 @@ public class WorkstationDemandTemplateController : ControllerBase
     {
         try
         {
-            await _workstationDemandTemplateService.AddAsync(workstationDemandTemplateDto).ConfigureAwait(false);
+            var response = await _workstationDemandTemplateService.AddAsync(workstationDemandTemplateDto).ConfigureAwait(false);
+            if (workstationDemandTemplateDto.IsActive)
+            {
+                var update = await _workstationDemandTemplateService.GetAllAsync().ConfigureAwait(false);
+
+                foreach (var item in update)
+                {
+                    if (item.Id != response.Id && item.IsActive)
+                    {
+                        item.IsActive = false;
+                        await _workstationDemandTemplateService.UpdateAsync(item).ConfigureAwait(false);
+                    }
+                }
+            }
             return Ok(workstationDemandTemplateDto);
         }
         catch (Exception ex)
@@ -72,6 +85,19 @@ public class WorkstationDemandTemplateController : ControllerBase
     {
         workstationDemandTemplateDto.Id = id;
         await _workstationDemandTemplateService.UpdateAsync(workstationDemandTemplateDto).ConfigureAwait(false);
+
+        if (workstationDemandTemplateDto.IsActive)
+        {
+            var update = await _workstationDemandTemplateService.GetAllAsync().ConfigureAwait(false);
+            foreach (var item in update)
+            {
+                if (item.Id != workstationDemandTemplateDto.Id && item.IsActive)
+                {
+                    item.IsActive = false;
+                    await _workstationDemandTemplateService.UpdateAsync(item).ConfigureAwait(false);
+                }
+            }
+        }
         return Ok(workstationDemandTemplateDto);
     }
 
