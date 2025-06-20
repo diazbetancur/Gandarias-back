@@ -62,6 +62,22 @@ public class WorkstationDemandController : ControllerBase
     {
         try
         {
+            var response = await _workstationDemandService.GetAllAsync(x =>
+                x.WorkstationId == workstationDemandDto.WorkstationId &&
+                x.TemplateId == workstationDemandDto.TemplateId &&
+                x.Day == workstationDemandDto.Day
+            ).ConfigureAwait(false);
+
+            bool isOverlapping = response.Any(existing =>
+                workstationDemandDto.StartTime < existing.EndTime &&
+                workstationDemandDto.EndTime > existing.StartTime
+            );
+
+            if (isOverlapping)
+            {
+                return BadRequest("Ya existe un horario que se sobrepone con el seleccionado.");
+            }
+
             await _workstationDemandService.AddAsync(workstationDemandDto).ConfigureAwait(false);
             return Ok(workstationDemandDto);
         }
@@ -81,6 +97,23 @@ public class WorkstationDemandController : ControllerBase
     public async Task<IActionResult> Put(Guid id, WorkstationDemandDto workstationDemandDto)
     {
         workstationDemandDto.Id = id;
+
+        var response = await _workstationDemandService.GetAllAsync(x =>
+                x.WorkstationId == workstationDemandDto.WorkstationId &&
+                x.TemplateId == workstationDemandDto.TemplateId &&
+                x.Day == workstationDemandDto.Day
+            ).ConfigureAwait(false);
+
+        bool isOverlapping = response.Any(existing =>
+            workstationDemandDto.StartTime < existing.EndTime &&
+            workstationDemandDto.EndTime > existing.StartTime
+        );
+
+        if (isOverlapping)
+        {
+            return BadRequest("Ya existe un horario que se sobrepone con el seleccionado.");
+        }
+
         await _workstationDemandService.UpdateAsync(workstationDemandDto).ConfigureAwait(false);
         return Ok(workstationDemandDto);
     }
