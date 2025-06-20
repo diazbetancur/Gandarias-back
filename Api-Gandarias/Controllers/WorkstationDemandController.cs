@@ -10,7 +10,6 @@ namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class WorkstationDemandController : ControllerBase
 {
     private readonly IWorkstationDemandService _workstationDemandService;
@@ -27,7 +26,7 @@ public class WorkstationDemandController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _workstationDemandService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _workstationDemandService.GetAllAsync(includeProperties: "Workstation.WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>

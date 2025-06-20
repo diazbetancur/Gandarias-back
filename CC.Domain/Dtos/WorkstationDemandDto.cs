@@ -9,4 +9,5 @@ public class WorkstationDemandDto
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public double EffortRequired { get; set; }
+    public Guid? WorkstationWorkAreaId { get; set; }
 }
