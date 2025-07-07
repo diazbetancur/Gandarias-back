@@ -100,7 +100,7 @@ public class WorkstationDemandController : ControllerBase
         var response = await _workstationDemandService.GetAllAsync(x =>
                 x.WorkstationId == workstationDemandDto.WorkstationId &&
                 x.TemplateId == workstationDemandDto.TemplateId &&
-                x.Day == workstationDemandDto.Day
+                x.Day == workstationDemandDto.Day && id != x.Id
             ).ConfigureAwait(false);
 
         bool isOverlapping = response.Any(existing =>
