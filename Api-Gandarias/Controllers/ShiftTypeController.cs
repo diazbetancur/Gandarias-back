@@ -1,4 +1,5 @@
-﻿using CC.Domain.Dtos;
+﻿using CC.Application.Services;
+using CC.Domain.Dtos;
 using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -47,6 +48,7 @@ public class ShiftTypeController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(ShiftTypeDto shiftTypeDto)
     {
+        shiftTypeDto.IsActive = true;
         await _shiftTypeService.AddAsync(shiftTypeDto).ConfigureAwait(false);
         return Ok(shiftTypeDto);
     }
@@ -62,6 +64,18 @@ public class ShiftTypeController : ControllerBase
     {
         shiftTypeDto.Id = id;
         await _shiftTypeService.UpdateAsync(shiftTypeDto).ConfigureAwait(false);
+        return Ok(shiftTypeDto);
+    }
+
+    /// <summary>
+    /// DELETE api/ShiftType/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
+    /// </summary>
+    /// <param name="shiftTypeDto"></param>
+    /// <returns></returns>
+    [HttpDelete()]
+    public async Task<IActionResult> Delete(ShiftTypeDto shiftTypeDto)
+    {
+        await _shiftTypeService.DeleteAsync(shiftTypeDto).ConfigureAwait(false);
         return Ok(shiftTypeDto);
     }
 }

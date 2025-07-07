@@ -8,7 +8,7 @@ public class EmployeeScheduleExceptionDto
     public Guid UserId { get; set; }
 
     public DateOnly Date { get; set; }
-    public RestrictionType RestrictionType { get; set; }
+    public string RestrictionType { get; set; }
     public bool IsAdditionalRestriction { get; set; }
 
     public TimeSpan? AvailableFrom { get; set; }
