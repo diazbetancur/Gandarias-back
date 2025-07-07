@@ -6,6 +6,7 @@ public class EmployeeScheduleExceptionDto
 {
     public Guid? Id { get; set; }
     public Guid UserId { get; set; }
+    public string? UserFullName { get; set; }
 
     public DateOnly Date { get; set; }
     public string RestrictionType { get; set; }

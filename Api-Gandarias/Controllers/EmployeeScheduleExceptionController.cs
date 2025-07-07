@@ -27,7 +27,7 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _employeeScheduleExceptionService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _employeeScheduleExceptionService.GetAllAsync(includeProperties: "User").ConfigureAwait(false));
     }
 
     /// <summary>
@@ -60,6 +60,16 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(EmployeeScheduleExceptionDto employeeScheduleExceptionDto)
     {
+        var response = await _employeeScheduleExceptionService.GetAllAsync(x =>
+            x.UserId == employeeScheduleExceptionDto.UserId &&
+            x.Date == employeeScheduleExceptionDto.Date
+        ).ConfigureAwait(false);
+
+        if (response.Count() > 0)
+        {
+            return BadRequest("Ya existe una novedad para esa fecha.");
+        }
+
         await _employeeScheduleExceptionService.AddAsync(employeeScheduleExceptionDto).ConfigureAwait(false);
         return Ok(employeeScheduleExceptionDto);
     }
@@ -74,6 +84,18 @@ public class EmployeeScheduleExceptionController : ControllerBase
     public async Task<IActionResult> Put(Guid id, EmployeeScheduleExceptionDto employeeScheduleExceptionDto)
     {
         employeeScheduleExceptionDto.Id = id;
+
+        var response = await _employeeScheduleExceptionService.GetAllAsync(x =>
+    x.UserId == employeeScheduleExceptionDto.UserId &&
+    x.Date == employeeScheduleExceptionDto.Date &&
+    x.Id != employeeScheduleExceptionDto.Id
+).ConfigureAwait(false);
+
+        if (response.Count() > 0)
+        {
+            return BadRequest("Ya existe una novedad para esa fecha.");
+        }
+
         await _employeeScheduleExceptionService.UpdateAsync(employeeScheduleExceptionDto).ConfigureAwait(false);
         return Ok(employeeScheduleExceptionDto);
     }
