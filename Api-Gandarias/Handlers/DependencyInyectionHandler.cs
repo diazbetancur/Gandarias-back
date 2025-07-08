@@ -77,7 +77,6 @@ public class DependencyInyectionHandler
         services.AddScoped<ILicenseService, LicenseService>();
         services.AddScoped<IHybridWorkstationService, HybridWorkstationService>();
         services.AddScoped<IUserWorkstationService, UserWorkstationService>();
-        services.AddScoped<IUserRestrictionShiftService, UserRestrictionShiftService>();
         services.AddScoped<IEmployeeScheduleRestrictionService, EmployeeScheduleRestrictionService>();
         services.AddScoped<IAbsenteeismTypeService, AbsenteeismTypeService>();
         services.AddScoped<IUserAbsenteeismService, UserAbsenteeismService>();
@@ -85,6 +84,7 @@ public class DependencyInyectionHandler
         services.AddScoped<ILawRestrictionService, LawRestrictionService>();
         services.AddScoped<IWorkstationDemandService, WorkstationDemandService>();
         services.AddScoped<IWorkstationDemandTemplateService, WorkstationDemandTemplateService>();
+        services.AddScoped<IEmployeeShiftTypeRestrictionService, EmployeeShiftTypeRestrictionService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -101,7 +101,6 @@ public class DependencyInyectionHandler
         services.AddScoped<ILicenseRepository, LicenseRepository>();
         services.AddScoped<IHybridWorkstationRepository, HybridWorkstationRepository>();
         services.AddScoped<IUserWorkstationRepository, UserWorkstationRepository>();
-        services.AddScoped<IUserRestrictionShiftRepository, UserRestrictionShiftRepository>();
         services.AddScoped<IEmployeeScheduleRestrictionRepository, EmployeeScheduleRestrictionRepository>();
         services.AddScoped<IAbsenteeismTypeRepository, AbsenteeismTypeRepository>();
         services.AddScoped<IUserAbsenteeismRepository, UserAbsenteeismRepository>();
@@ -109,6 +108,7 @@ public class DependencyInyectionHandler
         services.AddScoped<ILawRestrictionRepository, LawRestrictionRepository>();
         services.AddScoped<IWorkstationDemandRepository, WorkstationDemandRepository>();
         services.AddScoped<IWorkstationDemandTemplateRepository, WorkstationDemandTemplateRepository>();
+        services.AddScoped<IEmployeeShiftRestrictionRepository, EmployeeShiftRestrictionRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

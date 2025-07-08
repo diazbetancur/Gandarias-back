@@ -92,12 +92,12 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<WorkstationDemand> WorkstationDemands { get; set; }
 
-        // TODO: Revisar si es necesario esto
-
         /// <summary>
-        /// License
+        /// EmployeeShiftTypeRestriction
         /// </summary>
-        public DbSet<UserRestrictionShift> UserRestrictionShifts { get; set; }
+        public DbSet<EmployeeShiftTypeRestriction> EmployeeShiftTypeRestrictions { get; set; }
+
+        // TODO: Revisar si es necesario esto
 
         /// <summary>
         /// License
@@ -181,15 +181,15 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<WorkstationDemand>().HasKey(c => c.Id);
             modelBuilder.Entity<WorkstationDemand>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<WorkstationDemand>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<EmployeeShiftTypeRestriction>().HasKey(c => c.Id);
+            modelBuilder.Entity<EmployeeShiftTypeRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<EmployeeShiftTypeRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<License>().HasKey(c => c.Id);
             modelBuilder.Entity<License>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<License>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            modelBuilder.Entity<UserRestrictionShift>().HasKey(c => c.Id);
-            modelBuilder.Entity<UserRestrictionShift>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
-            modelBuilder.Entity<UserRestrictionShift>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

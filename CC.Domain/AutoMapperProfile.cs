@@ -21,7 +21,6 @@ namespace CC.Domain
             .ForMember(dest => dest.Workstation, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore());
             CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap();
-            CreateMap<UserRestrictionShift, UserRestrictionShiftDto>().ReverseMap();
             CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();
             CreateMap<AbsenteeismType, AbsenteeismTypeDto>().ReverseMap();
             CreateMap<UserAbsenteeism, UserAbsenteeismDto>().ReverseMap()
@@ -32,6 +31,9 @@ namespace CC.Domain
             CreateMap<WorkstationDemand, WorkstationDemandDto>().ReverseMap()
                 .ForMember(dest => dest.Workstation, opt => opt.Ignore());
             CreateMap<WorkstationDemandTemplate, WorkstationDemandTemplateDto>().ReverseMap();
+            CreateMap<EmployeeShiftTypeRestriction, EmployeeShiftTypeRestrictionDto>().ReverseMap()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.ShiftType, opt => opt.Ignore());
         }
     }
 }

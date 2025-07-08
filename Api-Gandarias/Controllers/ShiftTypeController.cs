@@ -75,7 +75,8 @@ public class ShiftTypeController : ControllerBase
     [HttpDelete()]
     public async Task<IActionResult> Delete(ShiftTypeDto shiftTypeDto)
     {
-        await _shiftTypeService.DeleteAsync(shiftTypeDto).ConfigureAwait(false);
+        shiftTypeDto.IsActive = false;
+        await _shiftTypeService.UpdateAsync(shiftTypeDto).ConfigureAwait(false);
         return Ok(shiftTypeDto);
     }
 }
