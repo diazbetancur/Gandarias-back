@@ -108,7 +108,14 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpDelete()]
     public async Task<IActionResult> Delete(EmployeeScheduleExceptionDto employeeScheduleExceptionDto)
     {
-        await _employeeScheduleExceptionService.DeleteAsync(employeeScheduleExceptionDto).ConfigureAwait(false);
-        return Ok(employeeScheduleExceptionDto);
+        try
+        {
+            await _employeeScheduleExceptionService.DeleteAsync(employeeScheduleExceptionDto).ConfigureAwait(false);
+            return Ok(employeeScheduleExceptionDto);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error al eliminar la novedad");
+        }
     }
 }
