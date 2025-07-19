@@ -13,11 +13,13 @@ namespace Gandarias.Controllers
     {
         private IUserService _userService;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public UserController(IUserService userService, IConfiguration configuration)
+        public UserController(IUserService userService, IConfiguration configuration, IEmailService emailService)
         {
             _userService = userService;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost("Login")]
@@ -62,7 +64,7 @@ namespace Gandarias.Controllers
         /// <summary>
         /// PUT api/user
         /// </summary>
-        /// returns></returns>
+        /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut]
         public async Task<IActionResult> Put(UserDto userDTO)
@@ -74,13 +76,44 @@ namespace Gandarias.Controllers
         /// <summary>
         /// DELETE api/user/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
         /// </summary>
-        /// returns></returns>
+        /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("{userId}")]
         public async Task<IActionResult> Delete(Guid userId)
         {
             var result = await _userService.RemoveUserFromRoleAsync(userId).ConfigureAwait(false);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Reset Password api/user/ResetPassword
+        /// </summary>
+        /// <param name="ResetPasswordDto"></param>
+        /// <returns></returns>
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            var result = await _userService.ResetPasswordAsync(resetPasswordDto);
+            return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
+        }
+
+        /// <summary>
+        /// Forgot Password api/user/ForgotPassword
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ForgotPassword")]
+        public async Task<IActionResult> ForgotPasswordAsync(string userName)
+        {
+            var result = await _userService.GeneratePasswordResetTokenAsync(userName);
+            if (result.WasSuccessful)
+            {
+                var user = await _userService.GetUserAsync(userName);
+                if (user != null)
+                {
+                    await _emailService.SendEmailAsync(user.Email, "Password Reset", $"Click <a href=\"{result.Result}\">here</a> to reset your password.");
+                }
+            }
+            return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
         }
     }
 }

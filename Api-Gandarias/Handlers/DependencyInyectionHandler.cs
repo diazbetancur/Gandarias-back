@@ -1,14 +1,17 @@
 ﻿using CC.Application.Services;
+using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Repositories;
 using CC.Domain.Interfaces.Services;
 using CC.Infrastructure.Configurations;
+using CC.Infrastructure.EmailServices;
 using CC.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Core;
+using System.Reflection;
 using ILogger = Serilog.ILogger;
-using Microsoft.Extensions.Configuration;
 
 namespace Gandarias.Handlers;
 
@@ -45,6 +48,14 @@ public class DependencyInyectionHandler
         RepositoryRegistration(services);
 
         #endregion RepositoriesRegistrarion
+
+        #region EmailService
+
+        services.Configure<EmailServiceOptions>(
+            configuration.GetSection("EmailService")
+        );
+
+        #endregion EmailService
 
         services.AddSingleton<ExceptionControl>();
 
@@ -85,6 +96,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkstationDemandService, WorkstationDemandService>();
         services.AddScoped<IWorkstationDemandTemplateService, WorkstationDemandTemplateService>();
         services.AddScoped<IEmployeeShiftTypeRestrictionService, EmployeeShiftTypeRestrictionService>();
+        services.AddScoped<IEmailService, EmailService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 

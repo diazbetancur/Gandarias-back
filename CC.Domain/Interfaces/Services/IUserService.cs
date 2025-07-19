@@ -30,5 +30,9 @@ namespace CC.Domain.Interfaces.Services
         Task<ActionResponse<bool>> RemoveUserFromRoleAsync(Guid userId);
 
         Task<List<UserDto>> GetAllUsers();
+
+        Task<ActionResponse<string>> GeneratePasswordResetTokenAsync(string userName);
+
+        Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
 }

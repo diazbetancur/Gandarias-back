@@ -1,54 +1,55 @@
-﻿using CC.Domain.Interfaces.Services;
+﻿using CC.Domain.Helpers;
+using CC.Domain.Interfaces.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net.Mail;
 
-namespace CC.Infrastructure.EmailServices
+namespace CC.Infrastructure.EmailServices;
+
+public class EmailService : IEmailService
 {
-    public class EmailService : IEmailService
+    private readonly EmailServiceOptions _options;
+    private readonly ILogger<EmailService> _logger;
+
+    public EmailService(IOptions<EmailServiceOptions> options, ILogger<EmailService> logger)
     {
-        private readonly string _smtpServer;
-        private readonly int _port;
-        private readonly string _fromEmail;
-        private readonly string _password;
-        private readonly bool _enableSsl;
+        _options = options.Value;
+    }
 
-        public EmailService(string smtpServer, int port, string fromEmail, string password, bool enableSsl = true)
+    public async Task SendEmailAsync(string toEmail, string subject, string bodyHtml)
+    {
+        try
         {
-            _smtpServer = smtpServer;
-            _port = port;
-            _fromEmail = fromEmail;
-            _password = password;
-            _enableSsl = enableSsl;
+            using var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_options.SmtpUser),
+                Subject = subject,
+                Body = bodyHtml,
+                IsBodyHtml = true
+            };
+
+            mailMessage.To.Add(toEmail);
+
+            using var smtpClient = new SmtpClient(_options.SmtpServer)
+            {
+                Port = _options.SmtpPort,
+                EnableSsl = _options.EnableSsl,
+                Credentials = new System.Net.NetworkCredential(_options.SmtpUser, _options.SmtpPassword),
+                Timeout = 30000
+            };
+
+            await smtpClient.SendMailAsync(mailMessage);
         }
-
-        public async Task SendWelcomeEmailAsync(string toEmail, string password)
+        catch (SmtpException smtpEx)
         {
-            try
-            {
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(_fromEmail),
-                    Subject = "",
-                    Body = "",
-                    IsBodyHtml = true
-                };
-
-                mailMessage.To.Add(toEmail);
-
-                using (var smtpClient = new SmtpClient())
-                {
-                    smtpClient.Host = _smtpServer;
-                    smtpClient.Port = _port;
-                    smtpClient.EnableSsl = _enableSsl;
-                    smtpClient.Credentials = new System.Net.NetworkCredential(_fromEmail, _password);
-                    smtpClient.Timeout = 10000;
-
-                    await smtpClient.SendMailAsync(mailMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al enviar el correo electrónico: {ex.Message}", ex);
-            }
+            _logger.LogError(smtpEx, "Error SMTP enviando email a {ToEmail}: {StatusCode}",
+    toEmail, smtpEx.StatusCode);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error general enviando email a {ToEmail}", toEmail);
+            throw;
         }
     }
 }

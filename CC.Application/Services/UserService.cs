@@ -193,7 +193,7 @@ namespace CC.Application.Services
                 //var roles = await _userRepository.GetUserRolesAsync(user);
                 //if (roles.Count != 0)
                 //{
-                //    var roleResult = await _userRepository.RemoveUserFromRoleAsync(user, roles[0]);
+                //   var roleResult = await _userRepository.RemoveUserFromRoleAsync(user, roles[0]);
                 //    if (!roleResult.Succeeded)
                 //    {
                 //        return new ActionResponse<bool>
@@ -207,7 +207,7 @@ namespace CC.Application.Services
                 //var deleteResult = await _userRepository.RemoveUserAsync(user);
                 //if (!deleteResult.Succeeded)
                 //{
-                //    return new ActionResponse<bool>
+                //   return new ActionResponse<bool>
                 //    {
                 //        WasSuccessful = false,
                 //        Message = "Error al eliminar el usuario.",
@@ -302,6 +302,66 @@ namespace CC.Application.Services
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Expiration = expiration
             };
+        }
+
+        public async Task<ActionResponse<string>> GeneratePasswordResetTokenAsync(string userName)
+        {
+            User userFind = await _userRepository.FindByAlternateKeyAsync(x => x.UserName.ToLower().Equals(userName.ToLower().Trim()));
+
+            if (userFind == null)
+            {
+                return new ActionResponse<string>
+                {
+                    WasSuccessful = false,
+                    Message = "Información enviada al correo electrónico.",
+                };
+            }
+
+            string response = await GeneratePasswordResetTokenAsync(userFind);
+            var url = _configuration.GetSection("Genearls:UrlForgot").Value + "/?Id=" + userFind.UserName + "&Code=" + response;
+
+            return new ActionResponse<string>
+            {
+                WasSuccessful = true,
+                Message = "Información enviada al correo electrónico. Revisa el spam que el correo puede llagar alli.",
+                Result = url
+            };
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            User userFind = await _userRepository.FindByAlternateKeyAsync(x => x.UserName.ToLower().Equals(resetPasswordDto.username.ToLower().Trim()));
+
+            if (userFind == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Usuario no existe." });
+            }
+            string decodedPassword = Base64UrlEncoder.Decode(resetPasswordDto.token);
+
+            if (userFind.PasswordResetTokenExpiration == null ||
+                userFind.PasswordResetTokenExpiration < DateTime.UtcNow ||
+                decodedPassword != userFind.PasswordResetToken)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Token inválido o expirado." });
+            }
+
+            var hasher = new PasswordHasher<User>();
+            userFind.PasswordHash = hasher.HashPassword(userFind, resetPasswordDto.newPassword);
+            userFind.PasswordResetToken = null;
+            userFind.PasswordResetTokenExpiration = null;
+            await _userRepository.UpdateAsync(userFind);
+            return IdentityResult.Success;
+        }
+
+        private async Task<string> GeneratePasswordResetTokenAsync(User user)
+        {
+            string code = Extensions.GenerateRandomPassword().GetSHA256();
+
+            user.PasswordResetToken = code;
+            user.PasswordResetTokenExpiration = DateTime.UtcNow.AddHours(1);
+            await _userRepository.UpdateAsync(user);
+            string encondePassword = Base64UrlEncoder.Encode(code);
+            return encondePassword;
         }
     }
 }

@@ -18,6 +18,8 @@ public class User : IdentityUser<Guid>
     public bool LawApply { get; set; } = false;
     public bool ExtraHours { get; set; } = false;
     public int CantPartTimeSchedule { get; set; } = 0;
+    public string? PasswordResetToken { get; set; } = null;
+    public DateTime? PasswordResetTokenExpiration { get; set; } = null;
     public virtual ICollection<UserWorkstation> UserWorkstations { get; set; } = new List<UserWorkstation>();
 
     [NotMapped]
