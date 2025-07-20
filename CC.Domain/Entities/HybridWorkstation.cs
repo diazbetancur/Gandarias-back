@@ -7,7 +7,12 @@ public class HybridWorkstation : EntityBase<Guid>
 
     public Guid WorkstationBId { get; set; }
     public virtual Workstation WorkstationB { get; set; }
+    public Guid? WorkstationCId { get; set; }
+    public virtual Workstation? WorkstationC { get; set; }
 
-    public string? Description { get; set; } // Opcional: para describir el par
+    public Guid? WorkstationDId { get; set; }
+    public virtual Workstation? WorkstationD { get; set; }
+
+    public string? Description { get; set; }
     public bool IsDeleted { get; set; } = false;
 }

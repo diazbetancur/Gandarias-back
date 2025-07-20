@@ -26,7 +26,7 @@ public class HybridWorkstationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _hybridWorkstationService.GetAllAsync(x => x.IsDeleted == false, includeProperties: "WorkstationA,WorkstationB").ConfigureAwait(false));
+        return Ok(await _hybridWorkstationService.GetAllAsync(x => !x.IsDeleted, includeProperties: "WorkstationA,WorkstationB,WorkstationC,WorkstationD").ConfigureAwait(false));
     }
 
     /// <summary>
