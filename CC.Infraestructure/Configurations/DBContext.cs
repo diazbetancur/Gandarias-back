@@ -97,6 +97,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<EmployeeShiftTypeRestriction> EmployeeShiftTypeRestrictions { get; set; }
 
+        /// <summary>
+        /// EmployeeShiftTypeRestriction
+        /// </summary>
+        public DbSet<Schedule> Schedules { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -185,6 +190,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<EmployeeShiftTypeRestriction>().HasKey(c => c.Id);
             modelBuilder.Entity<EmployeeShiftTypeRestriction>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<EmployeeShiftTypeRestriction>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Schedule>().HasKey(c => c.Id);
+            modelBuilder.Entity<Schedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<Schedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<License>().HasKey(c => c.Id);
