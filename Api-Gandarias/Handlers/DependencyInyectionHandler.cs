@@ -97,6 +97,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkstationDemandTemplateService, WorkstationDemandTemplateService>();
         services.AddScoped<IEmployeeShiftTypeRestrictionService, EmployeeShiftTypeRestrictionService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IUserShiftService, UserShiftService>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 
@@ -121,6 +122,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IWorkstationDemandRepository, WorkstationDemandRepository>();
         services.AddScoped<IWorkstationDemandTemplateRepository, WorkstationDemandTemplateRepository>();
         services.AddScoped<IEmployeeShiftRestrictionRepository, EmployeeShiftRestrictionRepository>();
+        services.AddScoped<IUserShiftRepository, UserShiftRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

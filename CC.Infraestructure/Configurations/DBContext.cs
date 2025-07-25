@@ -98,9 +98,14 @@ namespace CC.Infrastructure.Configurations
         public DbSet<EmployeeShiftTypeRestriction> EmployeeShiftTypeRestrictions { get; set; }
 
         /// <summary>
-        /// EmployeeShiftTypeRestriction
+        /// Schedule
         /// </summary>
         public DbSet<Schedule> Schedules { get; set; }
+
+        /// <summary>
+        /// UserShift
+        /// </summary>
+        public DbSet<UserShift> UserShifts { get; set; }
 
         // TODO: Revisar si es necesario esto
 
@@ -194,11 +199,15 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<Schedule>().HasKey(c => c.Id);
             modelBuilder.Entity<Schedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Schedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Schedule>().HasKey(c => c.Id);
+            modelBuilder.Entity<Schedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<Schedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
-            modelBuilder.Entity<License>().HasKey(c => c.Id);
-            modelBuilder.Entity<License>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
-            modelBuilder.Entity<License>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            modelBuilder.Entity<UserShift>().HasKey(c => c.Id);
+            modelBuilder.Entity<UserShift>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<UserShift>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.HasDefaultSchema("Management");
             DisableCascadingDelete(modelBuilder);

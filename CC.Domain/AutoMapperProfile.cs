@@ -35,6 +35,11 @@ namespace CC.Domain
             CreateMap<EmployeeShiftTypeRestriction, EmployeeShiftTypeRestrictionDto>().ReverseMap()
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.ShiftType, opt => opt.Ignore());
+            CreateMap<Schedule, ScheduleDto>().ReverseMap()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.Workstation, opt => opt.Ignore());
+            CreateMap<UserShift, UserShiftDto>().ReverseMap()
+                .ForMember(dest => dest.User, opt => opt.Ignore());
         }
     }
 }
