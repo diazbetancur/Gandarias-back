@@ -1,9 +1,13 @@
 ﻿using CC.Domain.Dtos;
+using CC.Domain.Enums;
+using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Gandarias.Controllers;
 
@@ -13,10 +17,14 @@ namespace Gandarias.Controllers;
 public class ScheduleController : ControllerBase
 {
     private readonly IScheduleService _scheduleService;
+    private readonly IEmailService _emailService;
+    private readonly IQrCodeService _qrCodeService;
 
-    public ScheduleController(IScheduleService scheduleService)
+    public ScheduleController(IScheduleService scheduleService, IEmailService emailService, IQrCodeService qrCodeService)
     {
         _scheduleService = scheduleService;
+        _emailService = emailService;
+        _qrCodeService = qrCodeService;
     }
 
     /// <summary>
@@ -25,8 +33,14 @@ public class ScheduleController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IActionResult> GetByIdAsync(Guid? userId, DateOnly fechaIni, DateOnly fechaFin)
+    public async Task<IActionResult> GetByIdAsync(DateOnly fechaIni, DateOnly fechaFin)
     {
+        var userRole = User.GetRoles();
+        Guid? userId = null;
+        if (!userRole.Any(x => x == RoleType.Admin.ToString()))
+        {
+            userId = User.GetUserId();
+        }
         return Ok(await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
         x.Date >= fechaIni &&
         x.Date <= fechaFin &&
@@ -107,5 +121,64 @@ public class ScheduleController : ControllerBase
         scheduleDto.IsDeleted = true;
         await _scheduleService.DeleteAsync(scheduleDto).ConfigureAwait(false);
         return Ok(scheduleDto);
+    }
+
+    /// <summary>
+    /// POST api/Schedule/notify?fechaIni=2025-07-01&fechaFin=2025-07-31
+    /// </summary>
+    /// <param name="fechaIni"></param>
+    /// <param name="fechaFin"></param>
+    /// <returns></returns>
+    [HttpPost("notify")]
+    public async Task<IActionResult> NotifySchedules(DateOnly fechaIni, DateOnly fechaFin)
+    {
+        try
+        {
+            var userRole = User.GetRoles();
+            if (!userRole.Any(x => x == RoleType.Admin.ToString()))
+            {
+                return Unauthorized("Solo los administradores pueden notificar horarios.");
+            }
+            if (fechaIni > fechaFin)
+            {
+                return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
+            }
+
+            var schedules = await _scheduleService.GetAllAsync(x =>
+                !x.IsDeleted &&
+                x.Date >= fechaIni &&
+                x.Date <= fechaFin, includeProperties: "User,Workstation"
+            ).ConfigureAwait(false);
+
+            if (!schedules.Any())
+            {
+                return BadRequest("No hay horiarios programados para reportar");
+            }
+
+            var subject = $"Horarios programados del {fechaIni:dd/MM/yyyy} al {fechaFin:dd/MM/yyyy}";
+            var groupedByUser = schedules.GroupBy(s => s.UserId);
+
+            var tasks = groupedByUser.Select(
+                async userGroup =>
+                {
+                    var user = userGroup.FirstOrDefault();
+                    var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
+
+                    var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
+
+                    if (!string.IsNullOrWhiteSpace(user?.UserEmail))
+                    {
+                        await _emailService.SendEmailAsync(user.UserEmail, subject, body, qrCode, $"{user.UserNickName}.png", "image/png");
+                    }
+                });
+
+            await Task.WhenAll(tasks);
+
+            return Ok("Horarios notificados correctamente.");
+        }
+        catch (Exception Ex)
+        {
+            return BadRequest("Error al notificar horarios: " + Ex.Message);
+        }
     }
 }

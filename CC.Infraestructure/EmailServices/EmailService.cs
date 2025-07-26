@@ -2,6 +2,7 @@
 using CC.Domain.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Data.SqlTypes;
 using System.Net.Mail;
 
 namespace CC.Infrastructure.EmailServices;
@@ -16,7 +17,7 @@ public class EmailService : IEmailService
         _options = options.Value;
     }
 
-    public async Task SendEmailAsync(string toEmail, string subject, string bodyHtml)
+    public async Task SendEmailAsync(string toEmail, string subject, string bodyHtml, byte[]? attach, string? name, string? mediaType)
     {
         try
         {
@@ -28,7 +29,32 @@ public class EmailService : IEmailService
                 IsBodyHtml = true
             };
 
+            mailMessage.Headers.Add("MIME-Version", "1.0");
+            mailMessage.Headers.Add("Content-Type", "text/html; charset=utf-8");
+
+            mailMessage.BodyEncoding = System.Text.Encoding.UTF8;
+            mailMessage.SubjectEncoding = System.Text.Encoding.UTF8;
+
             mailMessage.To.Add(toEmail);
+
+            if (attach != null && attach.Length > 0)
+            {
+                var qrStream = new MemoryStream(attach);
+                qrStream.Position = 0;
+
+                var attachmentName = name ?? "attachment.png";
+                var attachmentMediaType = mediaType ?? "image/png";
+
+                var inlineAttachment = new Attachment(qrStream, attachmentName, attachmentMediaType)
+                {
+                    ContentId = "qr-inline-cid"
+                };
+
+                inlineAttachment.ContentDisposition.Inline = true;
+                inlineAttachment.ContentDisposition.DispositionType = "inline";
+
+                mailMessage.Attachments.Add(inlineAttachment);
+            }
 
             using var smtpClient = new SmtpClient(_options.SmtpServer)
             {

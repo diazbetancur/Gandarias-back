@@ -11,12 +11,15 @@ public class ScheduleDto
 
     public Guid UserId { get; set; }
     public string? UserName { get; set; }
+    public string? UserNickName { get; set; }
+    public string? UserEmail { get; set; }
+    public string? UserFullName { get; set; }
 
     public Guid WorkstationId { get; set; }
     public string? WorkstationName { get; set; }
 
-    public TimeSpan StartTime { get; set; }
-    public TimeSpan EndTime { get; set; }
+    public TimeSpan? StartTime { get; set; }
+    public TimeSpan? EndTime { get; set; }
 
     public string? Observation { get; set; }
     public bool IsDeleted { get; set; }

@@ -99,6 +99,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IUserShiftService, UserShiftService>();
         services.AddScoped<IScheduleService, ScheduleService>();
+        services.AddScoped<IQrCodeService, QrCodeRepository>();
         //services.AddScoped<IAuditService, AuditService>();
     }
 

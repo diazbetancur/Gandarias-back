@@ -14,12 +14,14 @@ namespace Gandarias.Controllers
         private IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IQrCodeService _qrCodeService;
 
-        public UserController(IUserService userService, IConfiguration configuration, IEmailService emailService)
+        public UserController(IUserService userService, IConfiguration configuration, IEmailService emailService, IQrCodeService qrCodeService)
         {
             _userService = userService;
             _configuration = configuration;
             _emailService = emailService;
+            _qrCodeService = qrCodeService;
         }
 
         [HttpPost("Login")]
@@ -110,7 +112,7 @@ namespace Gandarias.Controllers
                 var user = await _userService.GetUserAsync(userName);
                 if (user != null)
                 {
-                    await _emailService.SendEmailAsync(user.Email, "Password Reset", $"Click <a href=\"{result.Result}\">here</a> to reset your password.");
+                    await _emailService.SendEmailAsync(user.Email, "Password Reset", $"Click <a href=\"{result.Result}\">here</a> to reset your password.", null, null, null);
                 }
             }
             return result != null ? Ok(result) : StatusCode((int)HttpStatusCode.Unauthorized);
