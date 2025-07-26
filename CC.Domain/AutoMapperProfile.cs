@@ -20,7 +20,11 @@ namespace CC.Domain
             CreateMap<UserWorkstation, UserWorkstationDto>().ReverseMap()
             .ForMember(dest => dest.Workstation, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore());
-            CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap();
+            CreateMap<HybridWorkstation, HybridWorkstationDto>().ReverseMap()
+                .ForMember(des => des.WorkstationA, opt => opt.Ignore())
+                .ForMember(des => des.WorkstationB, opt => opt.Ignore())
+                .ForMember(des => des.WorkstationC, opt => opt.Ignore())
+                .ForMember(des => des.WorkstationD, opt => opt.Ignore());
             CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();
             CreateMap<AbsenteeismType, AbsenteeismTypeDto>().ReverseMap();
             CreateMap<UserAbsenteeism, UserAbsenteeismDto>().ReverseMap()

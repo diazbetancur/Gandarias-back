@@ -19,35 +19,61 @@ public class HybridWorkstationRepository : ERepositoryBase<HybridWorkstation>, I
     {
         try
         {
-            var exist = await _dataContext.HybridWorkstations.FirstOrDefaultAsync(x => (x.WorkstationAId == entity.WorkstationAId && x.WorkstationBId == entity.WorkstationBId)
-            || (x.WorkstationBId == entity.WorkstationAId && x.WorkstationAId == entity.WorkstationBId));
-            if (exist == null)
+            var incomingIds = new[] {
+            entity.WorkstationAId,
+            entity.WorkstationBId,
+            entity.WorkstationCId,
+            entity.WorkstationDId
+        }.Where(x => x != null).Distinct().OrderBy(x => x).ToList();
+
+            var allHybridWorkstations = await _dataContext.HybridWorkstations
+    .AsNoTracking()
+    .ToListAsync();
+
+            var existing = allHybridWorkstations.FirstOrDefault(hw =>
             {
-                exist = new HybridWorkstation()
+                var existingIds = new[] {
+                hw.WorkstationAId,
+                hw.WorkstationBId,
+                hw.WorkstationCId,
+                hw.WorkstationDId
+            }.Where(x => x != null).Distinct().OrderBy(x => x).ToList();
+
+                return incomingIds.SequenceEqual(existingIds);
+            });
+
+            if (existing == null)
+            {
+                var newEntity = new HybridWorkstation
                 {
-                    WorkstationBId = entity.WorkstationBId,
+                    Id = Guid.NewGuid(),
                     WorkstationAId = entity.WorkstationAId,
-                    Id = new Guid(),
+                    WorkstationBId = entity.WorkstationBId,
+                    WorkstationCId = entity.WorkstationCId,
+                    WorkstationDId = entity.WorkstationDId,
                     Description = entity.Description,
                     IsDeleted = false,
                 };
-                _dataContext.Add(exist);
 
-                await _dataContext.SaveChangesAsync().ConfigureAwait(false);
+                _dataContext.Add(newEntity);
+                await _dataContext.SaveChangesAsync();
 
-                return exist;
+                return newEntity;
             }
 
-            if(exist.IsDeleted == true)
+            if (existing.IsDeleted)
             {
-                exist.IsDeleted = false;
+                var reactivated = await _dataContext.HybridWorkstations
+                    .FirstAsync(hw => hw.Id == existing.Id);
 
-                _dataContext.Update(exist);
-                await _dataContext.SaveChangesAsync().ConfigureAwait(false);
-                return exist;
+                reactivated.IsDeleted = false;
+                _dataContext.Update(reactivated);
+                await _dataContext.SaveChangesAsync();
+
+                return reactivated;
             }
 
-            throw new Exception("Ya existe la combinacion de puestos hibridos que desea crear.");
+            throw new Exception("Ya existe la combinación de puestos híbridos que desea crear.");
         }
         catch (Exception)
         {

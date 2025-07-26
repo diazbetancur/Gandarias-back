@@ -74,8 +74,7 @@ public class HybridWorkstationController : ControllerBase
     [HttpDelete()]
     public async Task<IActionResult> Delete(HybridWorkstationDto hybridWorkstationDto)
     {
-        hybridWorkstationDto.IsDelete = true;
-        await _hybridWorkstationService.UpdateAsync(hybridWorkstationDto).ConfigureAwait(false);
+        await _hybridWorkstationService.DeleteAsync(hybridWorkstationDto).ConfigureAwait(false);
         return Ok(hybridWorkstationDto);
     }
 }
