@@ -84,6 +84,7 @@ public class UserAbsenteeismController : ControllerBase
         userAbsenteeismDto.Id = id;
         var existingAbsenteeism = await _userAbsenteeismService.GetAllAsync(
             x => x.UserId == userAbsenteeismDto.UserId &&
+            x.Id != id &&
                  (x.EndDate ?? DateTime.MaxValue) >= userAbsenteeismDto.StartDate &&
                  x.StartDate <= (userAbsenteeismDto.EndDate ?? DateTime.MaxValue)
         ).ConfigureAwait(false);
