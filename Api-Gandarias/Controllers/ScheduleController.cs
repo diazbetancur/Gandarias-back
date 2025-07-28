@@ -33,7 +33,7 @@ public class ScheduleController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IActionResult> GetByIdAsync(DateOnly fechaIni, DateOnly fechaFin)
+    public async Task<IActionResult> GetByIdAsync(DateOnly fechaIni)
     {
         var userRole = User.GetRoles();
         Guid? userId = null;
@@ -41,10 +41,12 @@ public class ScheduleController : ControllerBase
         {
             userId = User.GetUserId();
         }
+
+        DateOnly fechaFin = fechaIni.AddDays(6);
         return Ok(await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
         x.Date >= fechaIni &&
         x.Date <= fechaFin &&
-        (!userId.HasValue || x.UserId == userId)).ConfigureAwait(false));
+        (!userId.HasValue || x.UserId == userId), includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>

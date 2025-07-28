@@ -26,4 +26,7 @@ public class ScheduleDto
 
     public string? IdUpdate { get; set; }
     public DateTime? DateUpdate { get; set; }
+
+    public Guid? WorkstationWorkAreaId { get; set; }
+    public string? WorkstationWorkAreaName { get; set; }
 }
