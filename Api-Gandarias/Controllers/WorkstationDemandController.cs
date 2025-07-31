@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Gandarias.Controllers;
 
@@ -48,7 +49,9 @@ public class WorkstationDemandController : ControllerBase
     [HttpGet("WorkstationDemandTemplateId/{id}")]
     public async Task<IActionResult> GetByWorkstationDemandTemplateIdAsync(Guid id)
     {
-        return Ok(await _workstationDemandService.GetAllAsync(x => x.TemplateId == id).ConfigureAwait(false));
+        var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == id).ConfigureAwait(false);
+        var result = data.Select(ToRawInput).ToList();
+        return Ok(result);
     }
 
     /// <summary>
@@ -57,33 +60,11 @@ public class WorkstationDemandController : ControllerBase
     /// <param name="WorkstationDemandDto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Post(WorkstationDemandDto workstationDemandDto)
+    public async Task<IActionResult> Post(List<DemandInsertUpdateDto> workstationDemandDto)
     {
-        try
-        {
-            var response = await _workstationDemandService.GetAllAsync(x =>
-                x.WorkstationId == workstationDemandDto.WorkstationId &&
-                x.TemplateId == workstationDemandDto.TemplateId &&
-                x.Day == workstationDemandDto.Day
-            ).ConfigureAwait(false);
-
-            bool isOverlapping = response.Any(existing =>
-                workstationDemandDto.StartTime < existing.EndTime &&
-                workstationDemandDto.EndTime > existing.StartTime
-            );
-
-            if (isOverlapping)
-            {
-                return BadRequest("Ya existe un horario que se sobrepone con el seleccionado.");
-            }
-
-            await _workstationDemandService.AddAsync(workstationDemandDto).ConfigureAwait(false);
-            return Ok(workstationDemandDto);
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
+        var dto = workstationDemandDto.Select(FromRawInput).ToList();
+        await _workstationDemandService.AddRangeAsync(dto);
+        return Ok(workstationDemandDto);
     }
 
     /// <summary>
@@ -92,28 +73,11 @@ public class WorkstationDemandController : ControllerBase
     /// <param name="id"></param>
     /// <param name="WorkstationDemandDto"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, WorkstationDemandDto workstationDemandDto)
+    [HttpPut]
+    public async Task<IActionResult> Put(List<DemandInsertUpdateDto> workstationDemandDto)
     {
-        workstationDemandDto.Id = id;
-
-        var response = await _workstationDemandService.GetAllAsync(x =>
-                x.WorkstationId == workstationDemandDto.WorkstationId &&
-                x.TemplateId == workstationDemandDto.TemplateId &&
-                x.Day == workstationDemandDto.Day && id != x.Id
-            ).ConfigureAwait(false);
-
-        bool isOverlapping = response.Any(existing =>
-            workstationDemandDto.StartTime < existing.EndTime &&
-            workstationDemandDto.EndTime > existing.StartTime
-        );
-
-        if (isOverlapping)
-        {
-            return BadRequest("Ya existe un horario que se sobrepone con el seleccionado.");
-        }
-
-        await _workstationDemandService.UpdateAsync(workstationDemandDto).ConfigureAwait(false);
+        var dto = workstationDemandDto.Select(FromRawInput).ToList();
+        await _workstationDemandService.UpdateRangeAsync(dto);
         return Ok(workstationDemandDto);
     }
 
@@ -127,5 +91,38 @@ public class WorkstationDemandController : ControllerBase
     {
         await _workstationDemandService.DeleteAsync(workstationDemandDto).ConfigureAwait(false);
         return Ok(workstationDemandDto);
+    }
+
+    public static WorkstationDemandDto FromRawInput(DemandInsertUpdateDto demandInsertUpdateDto)
+    {
+        var startTime = new TimeSpan(demandInsertUpdateDto.hora, demandInsertUpdateDto.fraccion, 0);
+        var endTime = startTime.Add(TimeSpan.FromMinutes(15));
+
+        return new WorkstationDemandDto
+        {
+            Id = demandInsertUpdateDto.Id,
+            WorkstationId = demandInsertUpdateDto.workstationId,
+            TemplateId = demandInsertUpdateDto.templateId,
+            Day = demandInsertUpdateDto.day,
+            StartTime = startTime,
+            EndTime = endTime,
+            EffortRequired = demandInsertUpdateDto.effortRequired,
+            WorkstationWorkAreaId = demandInsertUpdateDto.WorkstationWorkAreaId,
+        };
+    }
+
+    public static DemandInsertUpdateDto ToRawInput(WorkstationDemandDto dto)
+    {
+        return new DemandInsertUpdateDto
+        {
+            Id = dto.Id,
+            workstationId = dto.WorkstationId,
+            templateId = dto.TemplateId,
+            day = dto.Day,
+            hora = dto.StartTime.Hours,
+            fraccion = dto.StartTime.Minutes,
+            effortRequired = dto.EffortRequired,
+            WorkstationWorkAreaId = dto.WorkstationWorkAreaId
+        };
     }
 }
