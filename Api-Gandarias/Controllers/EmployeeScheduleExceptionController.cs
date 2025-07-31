@@ -27,7 +27,26 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _employeeScheduleExceptionService.GetAllAsync(includeProperties: "User").ConfigureAwait(false));
+        var fromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-365));
+        var rawData = await _employeeScheduleExceptionService.GetAllAsync(x => x.Date >= fromDate, includeProperties: "User").ConfigureAwait(false);
+
+        var formatted = rawData.Select(e => new EmployeeScheduleExceptionResponseDto
+        {
+            Id = e.Id,
+            UserId = e.UserId,
+            UserFullName = e.UserFullName,
+            Date = e.Date.ToString("dd/MM/yyyy"),
+            RestrictionType = e.RestrictionType,
+            IsAdditionalRestriction = e.IsAdditionalRestriction,
+            AvailableFrom = e.AvailableFrom,
+            AvailableUntil = e.AvailableUntil,
+            Block1Start = e.Block1Start,
+            Block1End = e.Block1End,
+            Block2Start = e.Block2Start,
+            Block2End = e.Block2End
+        });
+
+        return Ok(formatted);
     }
 
     /// <summary>
