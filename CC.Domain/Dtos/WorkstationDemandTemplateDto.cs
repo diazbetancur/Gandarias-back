@@ -5,6 +5,8 @@ public class WorkstationDemandTemplateDto
     public Guid? Id { get; set; }
     public string Name { get; set; }
     public bool IsActive { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
 
     public List<WorkstationDemandDto>? Demands { get; set; }
 }

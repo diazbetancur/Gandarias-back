@@ -15,10 +15,12 @@ namespace Gandarias.Controllers;
 public class WorkstationDemandTemplateController : ControllerBase
 {
     private readonly IWorkstationDemandTemplateService _workstationDemandTemplateService;
+    private readonly IWorkstationDemandService _workstationDemandService;
 
-    public WorkstationDemandTemplateController(IWorkstationDemandTemplateService workstationDemandTemplateService)
+    public WorkstationDemandTemplateController(IWorkstationDemandTemplateService workstationDemandTemplateService, IWorkstationDemandService workstationDemandService)
     {
         _workstationDemandTemplateService = workstationDemandTemplateService;
+        _workstationDemandService = workstationDemandService;
     }
 
     /// <summary>
@@ -109,6 +111,8 @@ public class WorkstationDemandTemplateController : ControllerBase
     [HttpDelete()]
     public async Task<IActionResult> Delete(WorkstationDemandTemplateDto workstationDemandTemplateDto)
     {
+        var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == workstationDemandTemplateDto.Id).ConfigureAwait(false);
+        await _workstationDemandService.DeleteRangeAsync(data).ConfigureAwait(false);
         await _workstationDemandTemplateService.DeleteAsync(workstationDemandTemplateDto).ConfigureAwait(false);
         return Ok(workstationDemandTemplateDto);
     }
