@@ -62,6 +62,11 @@ public class WorkstationDemandController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(List<DemandInsertUpdateDto> workstationDemandDto)
     {
+        var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == workstationDemandDto[0].templateId).ConfigureAwait(false);
+        if (data?.Count() > 0)
+        {
+            await _workstationDemandService.DeleteRangeAsync(data);
+        }
         var dto = workstationDemandDto.Select(FromRawInput).ToList();
         await _workstationDemandService.AddRangeAsync(dto);
         return Ok(workstationDemandDto);
