@@ -73,18 +73,60 @@ public class WorkstationDemandController : ControllerBase
     }
 
     /// <summary>
+    /// POST api/WorkstationDemand
+    /// </summary>
+    /// <param name="WorkstationDemandDto"></param>
+    /// <returns></returns>
+    [HttpPut]
+    public async Task<IActionResult> Post(DemandCloneDto cloneDto)
+    {
+        var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == cloneDto.templateId && x.Day == cloneDto.day).ConfigureAwait(false);
+
+        if (data == null || !data.Any())
+        {
+            return BadRequest("No hay información generada para clonar");
+        }
+
+        List<WorkstationDemandDto> cloneData = new List<WorkstationDemandDto>();
+        foreach (var day in cloneDto.dayOfWeeks)
+        {
+            var dataDay = await _workstationDemandService.GetAllAsync(x => x.TemplateId == cloneDto.templateId && x.Day == day).ConfigureAwait(false);
+
+            if (dataDay != null && dataDay.Any())
+            {
+                await _workstationDemandService.DeleteRangeAsync(dataDay);
+            }
+            foreach (var d in data)
+            {
+                var insertData = new WorkstationDemandDto()
+                {
+                    Day = day,
+                    TemplateId = d.TemplateId,
+                    EffortRequired = d.EffortRequired,
+                    EndTime = d.EndTime,
+                    StartTime = d.StartTime,
+                    WorkstationId = d.WorkstationId,
+                };
+                cloneData.Add(insertData);
+            }
+        }
+        await _workstationDemandService.AddRangeAsync(cloneData);
+        return Ok(cloneDto);
+    }
+
+    /// <summary>
     /// PUT api/WorkstationDemand/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
     /// </summary>
     /// <param name="id"></param>
     /// <param name="WorkstationDemandDto"></param>
     /// <returns></returns>
-    [HttpPut]
-    public async Task<IActionResult> Put(List<DemandInsertUpdateDto> workstationDemandDto)
-    {
-        var dto = workstationDemandDto.Select(FromRawInput).ToList();
-        await _workstationDemandService.UpdateRangeAsync(dto);
-        return Ok(workstationDemandDto);
-    }
+    //[HttpPut]
+    //public async Task<IActionResult> Put(List<DemandInsertUpdateDto> workstationDemandDto)
+    //{
+    //    var dto = workstationDemandDto.Select(FromRawInput).ToList();
+    //    await _workstationDemandService.UpdateRangeAsync(dto);
+    //    return Ok(workstationDemandDto);
+    //}
 
     /// <summary>
     /// DELETE api/WorkstationDemand/c5b257e0-e73f-4f34-a30c-c0e139ad8e58
