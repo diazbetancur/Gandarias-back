@@ -78,7 +78,7 @@ public class WorkstationDemandController : ControllerBase
     /// <param name="WorkstationDemandDto"></param>
     /// <returns></returns>
     [HttpPut]
-    public async Task<IActionResult> Post(DemandCloneDto cloneDto)
+    public async Task<IActionResult> Put(DemandCloneDto cloneDto)
     {
         var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == cloneDto.templateId && x.Day == cloneDto.day).ConfigureAwait(false);
 
