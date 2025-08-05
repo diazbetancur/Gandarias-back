@@ -73,7 +73,7 @@ public class WorkstationDemandController : ControllerBase
     }
 
     /// <summary>
-    /// POST api/WorkstationDemand
+    /// PUT api/WorkstationDemand
     /// </summary>
     /// <param name="WorkstationDemandDto"></param>
     /// <returns></returns>
