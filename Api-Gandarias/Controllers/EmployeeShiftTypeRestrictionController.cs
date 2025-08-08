@@ -64,17 +64,23 @@ public class EmployeeShiftTypeRestrictionController : ControllerBase
     {
         try
         {
-            foreach (var item in employeeShiftTypeRestrictionDto)
-            {
-                var exist = await _employeeShiftTypeRestrictionService
-                    .GetAllAsync(x => x.UserId == item.UserId && x.ShiftTypeId == item.ShiftTypeId)
-                    .ConfigureAwait(false);
+            var shifts = await _employeeShiftTypeRestrictionService.GetAllAsync(x => x.UserId == employeeShiftTypeRestrictionDto[0].UserId).ConfigureAwait(false);
 
-                if (exist.Any())
-                    continue;
+            if (shifts.Any())
+                await _employeeShiftTypeRestrictionService.DeleteRangeAsync(shifts);
 
-                await _employeeShiftTypeRestrictionService.AddAsync(item).ConfigureAwait(false);
-            }
+            await _employeeShiftTypeRestrictionService.AddRangeAsync(employeeShiftTypeRestrictionDto);
+            //foreach (var item in employeeShiftTypeRestrictionDto)
+            //{
+            //    var exist = await _employeeShiftTypeRestrictionService
+            //        .GetAllAsync(x => x.UserId == item.UserId && x.ShiftTypeId == item.ShiftTypeId)
+            //        .ConfigureAwait(false);
+
+            //    if (exist.Any())
+            //        continue;
+
+            //    await _employeeShiftTypeRestrictionService.AddAsync(item).ConfigureAwait(false);
+            //}
 
             return Ok(employeeShiftTypeRestrictionDto);
         }
@@ -102,9 +108,12 @@ public class EmployeeShiftTypeRestrictionController : ControllerBase
     /// <param name="EmployeeShiftTypeRestrictionDto"></param>
     /// <returns></returns>
     [HttpDelete()]
-    public async Task<IActionResult> Delete(EmployeeShiftTypeRestrictionDto employeeShiftTypeRestrictionDto)
+    public async Task<IActionResult> Delete(Guid userId)
     {
-        await _employeeShiftTypeRestrictionService.DeleteAsync(employeeShiftTypeRestrictionDto).ConfigureAwait(false);
-        return Ok(employeeShiftTypeRestrictionDto);
+        var shifts = await _employeeShiftTypeRestrictionService.GetAllAsync(x => x.UserId == userId).ConfigureAwait(false);
+
+        if (shifts.Any())
+            await _employeeShiftTypeRestrictionService.DeleteRangeAsync(shifts);
+        return Ok(userId);
     }
 }
