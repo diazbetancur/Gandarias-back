@@ -28,12 +28,12 @@ public class ScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// GET api/Schedule?userId={userId}&fechaIni=2025-07-01&fechaFin=2025-07-31
+    /// GET api/Schedule?fechaIni=2025-07-01
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<IActionResult> GetByIdAsync(DateOnly fechaIni)
+    public async Task<IActionResult> GetAllAsync(DateOnly fechaIni)
     {
         var userRole = User.GetRoles();
         Guid? userId = null;
@@ -47,6 +47,21 @@ public class ScheduleController : ControllerBase
         x.Date >= fechaIni &&
         x.Date <= fechaFin &&
         (!userId.HasValue || x.UserId == userId), includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false));
+    }
+
+    /// <summary>
+    /// GET api/Schedule?fechaIni=2025-07-01
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("ByUserId")]
+    public async Task<IActionResult> GetByIdAsync(DateOnly fechaIni, Guid UserId)
+    {
+        DateOnly fechaFin = fechaIni.AddDays(6);
+        return Ok(await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
+        x.Date >= fechaIni &&
+        x.Date <= fechaFin &&
+        x.UserId == UserId, includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>
