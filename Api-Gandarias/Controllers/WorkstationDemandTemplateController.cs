@@ -54,12 +54,12 @@ public class WorkstationDemandTemplateController : ControllerBase
     {
         try
         {
-            var templates = await _workstationDemandTemplateService.GetAllAsync().ConfigureAwait(false);
+            //var templates = await _workstationDemandTemplateService.GetAllAsync().ConfigureAwait(false);
 
-            if (HasOverlappingDateRangeByMonthDay(templates, workstationDemandTemplateDto.StartDate, workstationDemandTemplateDto.EndDate))
-            {
-                return BadRequest("Ya existe un rango que se cruza con el nuevo (por mes y día).");
-            }
+            //if (HasOverlappingDateRangeByMonthDay(templates, workstationDemandTemplateDto.StartDate, workstationDemandTemplateDto.EndDate))
+            //{
+            //    return BadRequest("Ya existe un rango que se cruza con el nuevo (por mes y día).");
+            //}
 
             var response = await _workstationDemandTemplateService.AddAsync(workstationDemandTemplateDto).ConfigureAwait(false);
             return Ok(response);
@@ -85,10 +85,10 @@ public class WorkstationDemandTemplateController : ControllerBase
             .GetAllAsync(x => x.Id != id)
             .ConfigureAwait(false);
 
-        if (HasOverlappingDateRangeByMonthDay(templates, workstationDemandTemplateDto.StartDate, workstationDemandTemplateDto.EndDate))
-        {
-            return BadRequest("Ya existe un rango que se cruza con el nuevo (por mes y día).");
-        }
+        //if (HasOverlappingDateRangeByMonthDay(templates, workstationDemandTemplateDto.StartDate, workstationDemandTemplateDto.EndDate))
+        //{
+        //    return BadRequest("Ya existe un rango que se cruza con el nuevo (por mes y día).");
+        //}
 
         await _workstationDemandTemplateService.UpdateAsync(workstationDemandTemplateDto);
 

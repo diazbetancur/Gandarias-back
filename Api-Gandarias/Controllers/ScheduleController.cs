@@ -64,7 +64,8 @@ public class ScheduleController : ControllerBase
             !x.IsDeleted &&
             x.Date == scheduleDto.Date &&
             x.UserId == scheduleDto.UserId &&
-            x.WorkstationId == scheduleDto.WorkstationId &&
+            x.WorkstationId == scheduleDto.WorkstationId
+            &&
             (
                 (scheduleDto.StartTime >= x.StartTime && scheduleDto.StartTime < x.EndTime) ||
                 (scheduleDto.EndTime > x.StartTime && scheduleDto.EndTime <= x.EndTime) ||

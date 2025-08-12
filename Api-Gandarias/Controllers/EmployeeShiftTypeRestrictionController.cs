@@ -70,17 +70,6 @@ public class EmployeeShiftTypeRestrictionController : ControllerBase
                 await _employeeShiftTypeRestrictionService.DeleteRangeAsync(shifts);
 
             await _employeeShiftTypeRestrictionService.AddRangeAsync(employeeShiftTypeRestrictionDto);
-            //foreach (var item in employeeShiftTypeRestrictionDto)
-            //{
-            //    var exist = await _employeeShiftTypeRestrictionService
-            //        .GetAllAsync(x => x.UserId == item.UserId && x.ShiftTypeId == item.ShiftTypeId)
-            //        .ConfigureAwait(false);
-
-            //    if (exist.Any())
-            //        continue;
-
-            //    await _employeeShiftTypeRestrictionService.AddAsync(item).ConfigureAwait(false);
-            //}
 
             return Ok(employeeShiftTypeRestrictionDto);
         }
