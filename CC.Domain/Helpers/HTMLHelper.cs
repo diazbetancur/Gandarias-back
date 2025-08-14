@@ -28,6 +28,9 @@ public class HTMLHelper
         var maxRowsPerDay = schedulesByDay.Values.DefaultIfEmpty(new List<ScheduleDto>()).Max(list => list.Count);
         var sb = new StringBuilder();
 
+        sb.Append(@"Hola " + schedules[0].UserFullName);
+        sb.Append("</br></br>");
+
         sb.Append(@"<table border='1' cellpadding='8' cellspacing='0' style='
         border-collapse: collapse;
         width: 100%;
@@ -89,6 +92,9 @@ public class HTMLHelper
         }
 
         sb.Append("</tbody></table>");
+        sb.Append("</br></br>");
+
+        sb.Append(@"Feliz dia !!");
         return sb.ToString();
     }
 }

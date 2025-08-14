@@ -148,7 +148,7 @@ public class ScheduleController : ControllerBase
     /// <param name="fechaFin"></param>
     /// <returns></returns>
     [HttpPost("notify")]
-    public async Task<IActionResult> NotifySchedules(DateOnly fechaIni, DateOnly fechaFin)
+    public async Task<IActionResult> NotifySchedules(DateOnly fechaIni)
     {
         try
         {
@@ -157,10 +157,8 @@ public class ScheduleController : ControllerBase
             {
                 return Unauthorized("Solo los administradores pueden notificar horarios.");
             }
-            if (fechaIni > fechaFin)
-            {
-                return BadRequest("La fecha de inicio no puede ser mayor que la fecha de fin.");
-            }
+
+            var fechaFin = fechaIni.AddDays(6);
 
             var schedules = await _scheduleService.GetAllAsync(x =>
                 !x.IsDeleted &&
