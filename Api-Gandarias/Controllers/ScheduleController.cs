@@ -251,7 +251,7 @@ public class ScheduleController : ControllerBase
             var httpClient = _httpClientFactory.CreateClient();
 
             var baseUrl = _configuration["PythonApiSettings:BaseUrl"];
-            var timeout = _configuration.GetValue<int>("PythonApiSettings:Timeout", 120);
+            var timeout = _configuration.GetValue<int>("PythonApiSettings:Timeout", 1520);
 
             httpClient.Timeout = TimeSpan.FromSeconds(timeout);
 

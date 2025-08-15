@@ -107,6 +107,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<UserShift> UserShifts { get; set; }
 
+        /// <summary>
+        /// SigningCofiguration
+        /// </summary>
+        public DbSet<SigningCofiguration> SigningCofigurations { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -203,6 +208,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<Schedule>().HasKey(c => c.Id);
             modelBuilder.Entity<Schedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Schedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<SigningCofiguration>().HasKey(c => c.Id);
+            modelBuilder.Entity<SigningCofiguration>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<SigningCofiguration>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
             // TODO: Revisar si es necesario esto
 
             modelBuilder.Entity<UserShift>().HasKey(c => c.Id);
