@@ -81,9 +81,21 @@ public class WorkstationDemandTemplateController : ControllerBase
     {
         workstationDemandTemplateDto.Id = id;
 
-        var templates = await _workstationDemandTemplateService
-            .GetAllAsync(x => x.Id != id)
-            .ConfigureAwait(false);
+        if (workstationDemandTemplateDto.IsActive)
+        {
+            var templates = await _workstationDemandTemplateService
+                .GetAllAsync(x => x.Id != id && x.IsActive)
+                .ConfigureAwait(false);
+
+            if (templates.Any())
+            {
+                foreach (var item in templates)
+                {
+                    item.IsActive = false;
+                }
+                await _workstationDemandTemplateService.UpdateRangeAsync(templates).ConfigureAwait(false);
+            }
+        }
 
         //if (HasOverlappingDateRangeByMonthDay(templates, workstationDemandTemplateDto.StartDate, workstationDemandTemplateDto.EndDate))
         //{

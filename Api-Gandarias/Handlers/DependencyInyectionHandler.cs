@@ -101,6 +101,8 @@ public class DependencyInyectionHandler
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddTransient<IQrCodeService, QrCodeRepository>();
         //services.AddScoped<IAuditService, AuditService>();
+
+        services.AddHttpClient();
     }
 
     public static void RepositoryRegistration(IServiceCollection services)

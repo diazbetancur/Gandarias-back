@@ -1,4 +1,5 @@
 ﻿using CC.Domain.Dtos;
+using CC.Domain.Entities;
 using CC.Domain.Enums;
 using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Services;
@@ -19,12 +20,18 @@ public class ScheduleController : ControllerBase
     private readonly IScheduleService _scheduleService;
     private readonly IEmailService _emailService;
     private readonly IQrCodeService _qrCodeService;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IConfiguration _configuration;
 
-    public ScheduleController(IScheduleService scheduleService, IEmailService emailService, IQrCodeService qrCodeService)
+    public ScheduleController(IScheduleService scheduleService, IEmailService emailService, IQrCodeService qrCodeService,
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration)
     {
         _scheduleService = scheduleService;
         _emailService = emailService;
         _qrCodeService = qrCodeService;
+        _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -35,18 +42,32 @@ public class ScheduleController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(DateOnly fechaIni)
     {
-        var userRole = User.GetRoles();
-        Guid? userId = null;
-        if (!userRole.Any(x => x == RoleType.Admin.ToString()))
+        try
         {
-            userId = User.GetUserId();
-        }
+            var userRole = User.GetRoles();
+            Guid? userId = null;
+            if (!userRole.Any(x => x == RoleType.Admin.ToString()))
+            {
+                userId = User.GetUserId();
+            }
 
-        DateOnly fechaFin = fechaIni.AddDays(6);
-        return Ok(await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
-        x.Date >= fechaIni &&
-        x.Date <= fechaFin &&
-        (!userId.HasValue || x.UserId == userId), includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false));
+            DateOnly fechaFin = fechaIni.AddDays(6);
+            var results = await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
+            x.Date >= fechaIni &&
+            x.Date <= fechaFin &&
+            (!userId.HasValue || x.UserId == userId), includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false);
+
+            if (!results.Any() && userRole.Any(x => x == RoleType.Admin.ToString()))
+            {
+                results = await AutomaticSchedule(fechaIni);
+            }
+
+            return Ok(results);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     /// <summary>
@@ -195,6 +216,50 @@ public class ScheduleController : ControllerBase
         catch (Exception Ex)
         {
             return BadRequest("Error al notificar horarios: " + Ex.Message);
+        }
+    }
+
+    private async Task<IEnumerable<ScheduleDto>> AutomaticSchedule(DateOnly fechaIni)
+    {
+        try
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            var baseUrl = _configuration["PythonApiSettings:BaseUrl"];
+            var timeout = _configuration.GetValue<int>("PythonApiSettings:Timeout", 120);
+
+            httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+
+            var weekStart = fechaIni.ToString("yyyy-MM-dd");
+
+            var requestBody = new
+            {
+                week_start = weekStart,
+                force = false
+            };
+
+            var json = System.Text.Json.JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var requestUrl = $"{baseUrl}/api/agenda/save";
+            var response = await httpClient.PostAsync(requestUrl, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                DateOnly fechaFin = fechaIni.AddDays(6);
+                return await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
+                    x.Date >= fechaIni &&
+                    x.Date <= fechaFin, includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false);
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Python API error: {response.StatusCode} - {errorContent}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error generating automatic schedule: {ex.Message}", ex);
         }
     }
 }
