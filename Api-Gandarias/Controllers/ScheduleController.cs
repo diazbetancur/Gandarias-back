@@ -181,35 +181,50 @@ public class ScheduleController : ControllerBase
 
             var fechaFin = fechaIni.AddDays(6);
 
+            // Obtener los schedules una sola vez
             var schedules = await _scheduleService.GetAllAsync(x =>
                 !x.IsDeleted &&
                 x.Date >= fechaIni &&
-                x.Date <= fechaFin, includeProperties: "User,Workstation"
+                x.Date <= fechaFin,
+                includeProperties: "User,Workstation"
             ).ConfigureAwait(false);
 
             if (!schedules.Any())
             {
-                return BadRequest("No hay horiarios programados para reportar");
+                return BadRequest("No hay horarios programados para reportar");
             }
 
             var subject = $"Horarios programados del {fechaIni:dd/MM/yyyy} al {fechaFin:dd/MM/yyyy}";
-            var groupedByUser = schedules.GroupBy(s => s.UserId);
 
-            var tasks = groupedByUser.Select(
-                async userGroup =>
-                {
-                    var user = userGroup.FirstOrDefault();
-                    var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
+            // Agrupar por usuario y materializar la consulta
+            var groupedByUsers = schedules
+                .Where(s => !string.IsNullOrWhiteSpace(s.UserEmail))
+                .GroupBy(s => s.UserId)
+                .ToList();
+            var groupedByUser = schedules.GroupBy(s => s.UserId).ToList();
 
-                    var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
+            // OPCIÓN 1: Procesamiento secuencial (más seguro)
+            await ProcessSchedulesSequentially(groupedByUser, subject);
 
-                    if (!string.IsNullOrWhiteSpace(user?.UserEmail))
-                    {
-                        await _emailService.SendEmailAsync(user.UserEmail, subject, body, qrCode, $"{user.UserNickName}.png", "image/png");
-                    }
-                });
+            //var groupedByUser = schedules.GroupBy(s => s.UserId);
 
-            await Task.WhenAll(tasks);
+            //await ProcessSchedulesSequentially(groupedByUser, subject);
+
+            //var tasks = groupedByUser.Select(
+            //    async userGroup =>
+            //    {
+            //        var user = userGroup.FirstOrDefault();
+            //        var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
+
+            //        var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
+
+            //        if (!string.IsNullOrWhiteSpace(user?.UserEmail))
+            //        {
+            //            await _emailService.SendEmailAsync(user.UserEmail, subject, body, qrCode, $"{user.UserNickName}.png", "image/png");
+            //        }
+            //    });
+
+            //await Task.WhenAll(tasks);
 
             return Ok("Horarios notificados correctamente.");
         }
@@ -260,6 +275,28 @@ public class ScheduleController : ControllerBase
         catch (Exception ex)
         {
             throw new Exception($"Error generating automatic schedule: {ex.Message}", ex);
+        }
+    }
+
+    private async Task ProcessSchedulesSequentially(
+        IEnumerable<IGrouping<Guid, ScheduleDto>> groupedByUser,
+        string subject)
+    {
+        foreach (var userGroup in groupedByUser)
+        {
+            var user = userGroup.FirstOrDefault();
+
+            var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
+            var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
+
+            await _emailService.SendEmailAsync(
+                user.UserEmail,
+                subject,
+                body,
+                qrCode,
+                $"{user.UserNickName}.png",
+                "image/png"
+            ).ConfigureAwait(false);
         }
     }
 }
