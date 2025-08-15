@@ -204,7 +204,17 @@ public class ScheduleController : ControllerBase
             var groupedByUser = schedules.GroupBy(s => s.UserId).ToList();
 
             // OPCIÓN 1: Procesamiento secuencial (más seguro)
-            await ProcessSchedulesSequentially(groupedByUser, subject);
+            var generatedTokens = await ProcessSchedulesSequentially(groupedByUser, subject, fechaIni);
+
+            foreach (var token in generatedTokens)
+            {
+                foreach (var schedule in schedules.Where(s => s.UserId == token.UserId))
+                {
+                    schedule.Token = token.EncryptedToken;
+                }
+            }
+
+            await _scheduleService.UpdateRangeAsync(schedules);
 
             //var groupedByUser = schedules.GroupBy(s => s.UserId);
 
@@ -278,25 +288,36 @@ public class ScheduleController : ControllerBase
         }
     }
 
-    private async Task ProcessSchedulesSequentially(
+    private async Task<List<UserTokenResult>> ProcessSchedulesSequentially(
         IEnumerable<IGrouping<Guid, ScheduleDto>> groupedByUser,
-        string subject)
+        string subject, DateOnly fechaIni)
     {
+        var tokenResults = new List<UserTokenResult>();
+
         foreach (var userGroup in groupedByUser)
         {
             var user = userGroup.FirstOrDefault();
+            var tokenResult = new UserTokenResult
+            {
+                UserId = user.UserId,
+            };
 
             var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
-            var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
+            var (encryptedToken, qrCodeBytes) = await _qrCodeService.GenerateWeeklyTokenAsync(user.UserId, fechaIni).ConfigureAwait(false);
+            tokenResult.EncryptedToken = encryptedToken;
 
             await _emailService.SendEmailAsync(
                 user.UserEmail,
                 subject,
                 body,
-                qrCode,
+                qrCodeBytes,
                 $"{user.UserNickName}.png",
                 "image/png"
             ).ConfigureAwait(false);
+
+            tokenResults.Add(tokenResult);
         }
+
+        return tokenResults;
     }
 }

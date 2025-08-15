@@ -10,66 +10,163 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace CC.Infrastructure.Repositories;
 
 public class QrCodeRepository : IQrCodeService
 {
-    private readonly IUserService _userService;
     private readonly QrCodeOptions _options;
+    private readonly IEncryptionService _encryptionService;
+    //public QrCodeRepository(
+    //    IUserService userService,
+    //    IOptions<QrCodeOptions> options)
+    //{
+    //    _userService = userService;
+    //    _options = options.Value;
 
-    public QrCodeRepository(
-        IUserService userService,
-        IOptions<QrCodeOptions> options)
+    public QrCodeRepository(IEncryptionService encryptionService, IOptions<QrCodeOptions> options)
     {
-        _userService = userService;
+        _encryptionService = encryptionService;
         _options = options.Value;
     }
 
-    public async Task<byte[]> GenerateUserQrAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<(string encryptedToken, byte[] qrCodeBytes)> GenerateWeeklyTokenAsync(Guid userId, DateOnly weekStart)
     {
-        return await GenerateUserDetailQrAsync(userId, false, cancellationToken);
-    }
+        var weekEnd = weekStart.AddDays(6);
+        var validUntil = weekEnd.ToDateTime(TimeOnly.MaxValue).AddDays(1);
 
-    public async Task<byte[]> GenerateUserDetailQrAsync(
-        Guid userId,
-        bool includeDetails = false,
-        CancellationToken cancellationToken = default)
-    {
-        try
+        var tokenData = new
         {
-            var user = await _userService.FindByIdAsync(userId);
-            if (user == null)
-            {
-                throw new ArgumentException($"Usuario {userId} no encontrado");
-            }
-
-            var qrData = PrepareQrDataAsync(user);
-
-            return await GenerateQrBytesAsync(qrData, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
-    }
-
-    private string PrepareQrDataAsync(UserDto user)
-    {
-        var qrData = new
-        {
-            UserId = user.Id,
-            Email = user.Email,
-            GeneratedAt = DateTime.UtcNow
+            UserId = userId,
+            WeekStart = weekStart.ToString("yyyy-MM-dd"),
+            WeekEnd = weekEnd.ToString("yyyy-MM-dd"),
+            ValidUntil = validUntil.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         };
 
-        var json = System.Text.Json.JsonSerializer.Serialize(qrData, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        var jsonToken = JsonSerializer.Serialize(tokenData);
+        var encryptedToken = await _encryptionService.EncryptAsync(jsonToken);
 
-        return json;
+        CancellationToken cancellationToken = default;
+
+        //var qrCodeBytes = await _qrCodeGenerator.GenerateQrCodeAsync(encryptedToken);
+        var qrCodeBytes = await GenerateQrBytesAsync(encryptedToken, cancellationToken);
+
+        return (encryptedToken, qrCodeBytes);
     }
+
+    public async Task<QrTokenValidationResult> ValidateTokenAsync(string encryptedToken)
+    {
+        //try
+        //{
+        //    // Buscar token en base de datos
+        //    var dbToken = await _tokenRepository.GetFirstOrDefaultAsync(
+        //        x => x.EncryptedToken == encryptedToken && x.IsActive,
+        //        includeProperties: "User"
+        //    );
+
+        //    if (dbToken == null)
+        //    {
+        //        return new QrTokenValidationResult
+        //        {
+        //            IsValid = false,
+        //            ErrorMessage = "Token no encontrado o inactivo"
+        //        };
+        //    }
+
+        //    // Verificar expiración
+        //    if (dbToken.ValidUntil <= DateTime.UtcNow)
+        //    {
+        //        return new QrTokenValidationResult
+        //        {
+        //            IsValid = false,
+        //            ErrorMessage = "Token expirado"
+        //        };
+        //    }
+
+        //    // Descifrar y validar contenido
+        //    var decryptedJson = await _encryptionService.DecryptAsync(encryptedToken);
+        //    var tokenData = JsonSerializer.Deserialize<dynamic>(decryptedJson);
+
+        //    return new QrTokenValidationResult
+        //    {
+        //        IsValid = true,
+        //        UserId = dbToken.UserId,
+        //        UserName = dbToken.User?.UserNickName,
+        //        WeekStart = dbToken.WeekStart,
+        //        WeekEnd = dbToken.WeekEnd,
+        //        ValidUntil = dbToken.ValidUntil,
+        //        TokenId = dbToken.TokenId
+        //    };
+        //}
+        //catch (Exception ex)
+        //{
+        //    _logger.LogError(ex, "Error validando token: {Token}", encryptedToken.Substring(0, 10) + "...");
+        //    return new QrTokenValidationResult
+        //    {
+        //        IsValid = false,
+        //        ErrorMessage = "Error validando token"
+        //    };
+        //}
+
+        return null;
+    }
+
+    //private readonly IUserService _userService;
+
+    //public QrCodeRepository(
+    //    IUserService userService,
+    //    IOptions<QrCodeOptions> options)
+    //{
+    //    _userService = userService;
+    //    _options = options.Value;
+    //}
+
+    //public async Task<byte[]> GenerateUserQrAsync(Guid userId, CancellationToken cancellationToken = default)
+    //{
+    //    return await GenerateUserDetailQrAsync(userId, false, cancellationToken);
+    //}
+
+    //public async Task<byte[]> GenerateUserDetailQrAsync(
+    //    Guid userId,
+    //    bool includeDetails = false,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    try
+    //    {
+    //        var user = await _userService.FindByIdAsync(userId);
+    //        if (user == null)
+    //        {
+    //            throw new ArgumentException($"Usuario {userId} no encontrado");
+    //        }
+
+    //        var qrData = PrepareQrDataAsync(user);
+
+    //        return await GenerateQrBytesAsync(qrData, cancellationToken);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw;
+    //    }
+    //}
+
+    //private string PrepareQrDataAsync(UserDto user)
+    //{
+    //    var qrData = new
+    //    {
+    //        UserId = user.Id,
+    //        Email = user.Email,
+    //        GeneratedAt = DateTime.UtcNow
+    //    };
+
+    //    var json = System.Text.Json.JsonSerializer.Serialize(qrData, new JsonSerializerOptions
+    //    {
+    //        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    //    });
+
+    //    return json;
+    //}
 
     private async Task<byte[]> GenerateQrBytesAsync(string data, CancellationToken cancellationToken)
     {

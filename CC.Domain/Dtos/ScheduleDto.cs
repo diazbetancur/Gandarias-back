@@ -29,4 +29,5 @@ public class ScheduleDto
 
     public Guid? WorkstationWorkAreaId { get; set; }
     public string? WorkstationWorkAreaName { get; set; }
+    public string? Token { get; set; }
 }

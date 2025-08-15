@@ -20,4 +20,5 @@ public class Schedule : EntityBase<Guid>
     public DateTime? DateUpdate { get; set; }
 
     public bool Notified { get; set; } = false;
+    public string? Token { get; set; } = string.Empty;
 }
