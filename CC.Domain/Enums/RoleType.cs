@@ -4,4 +4,5 @@ public enum RoleType
 {
     Admin,
     Employee,
+    Coordinator
 }

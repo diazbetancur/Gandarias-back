@@ -58,115 +58,75 @@ public class QrCodeRepository : IQrCodeService
 
     public async Task<QrTokenValidationResult> ValidateTokenAsync(string encryptedToken)
     {
-        //try
-        //{
-        //    // Buscar token en base de datos
-        //    var dbToken = await _tokenRepository.GetFirstOrDefaultAsync(
-        //        x => x.EncryptedToken == encryptedToken && x.IsActive,
-        //        includeProperties: "User"
-        //    );
+        try
+        {
+            if (string.IsNullOrEmpty(encryptedToken) || string.IsNullOrWhiteSpace(encryptedToken))
+            {
+                return new QrTokenValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Token vacío o nulo"
+                };
+            }
 
-        //    if (dbToken == null)
-        //    {
-        //        return new QrTokenValidationResult
-        //        {
-        //            IsValid = false,
-        //            ErrorMessage = "Token no encontrado o inactivo"
-        //        };
-        //    }
+            var decryptedJson = await _encryptionService.DecryptAsync(encryptedToken);
+            using var jsonDoc = JsonDocument.Parse(decryptedJson);
+            var root = jsonDoc.RootElement;
 
-        //    // Verificar expiración
-        //    if (dbToken.ValidUntil <= DateTime.UtcNow)
-        //    {
-        //        return new QrTokenValidationResult
-        //        {
-        //            IsValid = false,
-        //            ErrorMessage = "Token expirado"
-        //        };
-        //    }
+            if (!root.TryGetProperty("UserId", out var userIdElement) ||
+                !root.TryGetProperty("ValidUntil", out var validUntilElement) ||
+                !root.TryGetProperty("WeekStart", out var weekStartElement) ||
+                !root.TryGetProperty("WeekEnd", out var weekEndElement))
+            {
+                return new QrTokenValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Token con formato inválido"
+                };
+            }
 
-        //    // Descifrar y validar contenido
-        //    var decryptedJson = await _encryptionService.DecryptAsync(encryptedToken);
-        //    var tokenData = JsonSerializer.Deserialize<dynamic>(decryptedJson);
+            if (!Guid.TryParse(userIdElement.GetString(), out var userId) ||
+                !DateTime.TryParse(validUntilElement.GetString(), out var validUntil) ||
+                !DateOnly.TryParse(weekStartElement.GetString(), out var weekStart) ||
+                !DateOnly.TryParse(weekEndElement.GetString(), out var weekEnd))
+            {
+                return new QrTokenValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Datos del token con formato inválido"
+                };
+            }
 
-        //    return new QrTokenValidationResult
-        //    {
-        //        IsValid = true,
-        //        UserId = dbToken.UserId,
-        //        UserName = dbToken.User?.UserNickName,
-        //        WeekStart = dbToken.WeekStart,
-        //        WeekEnd = dbToken.WeekEnd,
-        //        ValidUntil = dbToken.ValidUntil,
-        //        TokenId = dbToken.TokenId
-        //    };
-        //}
-        //catch (Exception ex)
-        //{
-        //    _logger.LogError(ex, "Error validando token: {Token}", encryptedToken.Substring(0, 10) + "...");
-        //    return new QrTokenValidationResult
-        //    {
-        //        IsValid = false,
-        //        ErrorMessage = "Error validando token"
-        //    };
-        //}
-
-        return null;
+            if (validUntil <= DateTime.UtcNow)
+            {
+                return new QrTokenValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Token expirado",
+                    UserId = userId,
+                    WeekStart = weekStart,
+                    WeekEnd = weekEnd,
+                    ValidUntil = validUntil
+                };
+            }
+            return new QrTokenValidationResult
+            {
+                IsValid = true,
+                UserId = userId,
+                WeekStart = weekStart,
+                WeekEnd = weekEnd,
+                ValidUntil = validUntil
+            };
+        }
+        catch (Exception)
+        {
+            return new QrTokenValidationResult
+            {
+                IsValid = false,
+                ErrorMessage = "Error interno validando token"
+            };
+        }
     }
-
-    //private readonly IUserService _userService;
-
-    //public QrCodeRepository(
-    //    IUserService userService,
-    //    IOptions<QrCodeOptions> options)
-    //{
-    //    _userService = userService;
-    //    _options = options.Value;
-    //}
-
-    //public async Task<byte[]> GenerateUserQrAsync(Guid userId, CancellationToken cancellationToken = default)
-    //{
-    //    return await GenerateUserDetailQrAsync(userId, false, cancellationToken);
-    //}
-
-    //public async Task<byte[]> GenerateUserDetailQrAsync(
-    //    Guid userId,
-    //    bool includeDetails = false,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    try
-    //    {
-    //        var user = await _userService.FindByIdAsync(userId);
-    //        if (user == null)
-    //        {
-    //            throw new ArgumentException($"Usuario {userId} no encontrado");
-    //        }
-
-    //        var qrData = PrepareQrDataAsync(user);
-
-    //        return await GenerateQrBytesAsync(qrData, cancellationToken);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        throw;
-    //    }
-    //}
-
-    //private string PrepareQrDataAsync(UserDto user)
-    //{
-    //    var qrData = new
-    //    {
-    //        UserId = user.Id,
-    //        Email = user.Email,
-    //        GeneratedAt = DateTime.UtcNow
-    //    };
-
-    //    var json = System.Text.Json.JsonSerializer.Serialize(qrData, new JsonSerializerOptions
-    //    {
-    //        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    //    });
-
-    //    return json;
-    //}
 
     private async Task<byte[]> GenerateQrBytesAsync(string data, CancellationToken cancellationToken)
     {
