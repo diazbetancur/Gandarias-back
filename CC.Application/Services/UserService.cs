@@ -288,7 +288,11 @@ namespace CC.Application.Services
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            DateTime expiration = DateTime.UtcNow.AddHours(1);
+            DateTime expiration = roles.Any(x =>
+                string.Equals(x, RoleType.Coordinator.ToString(), StringComparison.OrdinalIgnoreCase))
+                ? DateTime.UtcNow.AddHours(24)
+                : DateTime.UtcNow.AddHours(1);
+
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: null,
                 audience: null,

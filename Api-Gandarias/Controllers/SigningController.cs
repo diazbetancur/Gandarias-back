@@ -1,6 +1,10 @@
 ﻿using CC.Application.Services;
 using CC.Domain.Dtos;
+using CC.Domain.Enums;
+using CC.Domain.Helpers;
 using CC.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +12,7 @@ namespace Gandarias.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class SigningController : ControllerBase
 {
     private readonly IQrCodeService _qrCodeService;
@@ -31,6 +36,12 @@ public class SigningController : ControllerBase
     {
         try
         {
+            var userRole = User.GetRoles();
+            if (!userRole.Any(x => x == RoleType.Coordinator.ToString()))
+            {
+                return Unauthorized();
+            }
+
             var result = await _qrCodeService.ValidateTokenAsync(token);
 
             if (!result.IsValid)
@@ -63,5 +74,17 @@ public class SigningController : ControllerBase
         {
             throw;
         }
+    }
+
+    /// <summary>
+    /// POST api/Signing
+    /// </summary>
+    /// <param token="string"></param>
+    /// <param confirm="Boolean"></param>
+    /// <returns></returns>
+    [HttpPost("Confirm")]
+    public async Task<IActionResult> PostConfirm(string token, Boolean confirm)
+    {
+        return (Ok());
     }
 }

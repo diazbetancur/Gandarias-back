@@ -32,6 +32,7 @@ public class SeedDB
         await CheckRolePermissionEmployeeAsync();
         await ChechEmployeeAsync();
         await CheckLawRestrictions();
+        await ChechCoordinatorAsync();
 
         // Solo para crear los usuarios
         //await fillDataUser();
@@ -76,6 +77,31 @@ public class SeedDB
             if (resultUserCreated.WasSuccessful)
             {
                 IdentityResult roleResult = await _userService.AddUserToRoleAsync(resultUserCreated.Result, RoleType.Admin.ToString());
+            }
+        }
+    }
+
+    private async Task ChechCoordinatorAsync()
+    {
+        if (_context.Users.Any())
+        {
+            var user = new UserDto
+            {
+                DNI = "Fichaje",
+                Email = "horarios@restaurantegandarias.com",
+                FirstName = "Fichaje",
+                LastName = "Fichaje",
+                NickName = "Fichaje",
+                HireDate = DateTime.UtcNow,
+                HireTypeId = _context.HireTypes.FirstOrDefault(x => x.Name == "Tiempo Completo")?.Id,
+                PhoneNumber = "0000000000",
+            };
+
+            ActionResponse<User> resultUserCreated = await _userService.AddUserAsync(user, "FichajeGandarias1.");
+
+            if (resultUserCreated.WasSuccessful)
+            {
+                IdentityResult roleResult = await _userService.AddUserToRoleAsync(resultUserCreated.Result, RoleType.Coordinator.ToString());
             }
         }
     }

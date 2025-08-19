@@ -7,7 +7,7 @@ public class Schedule : EntityBase<Guid>
     public Guid UserId { get; set; }
     public virtual User User { get; set; }
 
-    public Guid WorkstationId { get; set; }
+    public Guid? WorkstationId { get; set; }
     public virtual Workstation Workstation { get; set; }
 
     public TimeSpan? StartTime { get; set; }
