@@ -15,29 +15,50 @@ namespace CC.Domain.Helpers
         /// <returns>A random password</returns>
         public static string GenerateRandomPassword(PasswordOptions opts = null)
         {
-            // Define los caracteres válidos para la contraseña
-            const string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=[{]};:>|./?";
-
-            // Usa un generador de números aleatorios criptográficamente seguro
-            byte[] randomData = new byte[8];
-
-            // Genera los bytes aleatorios usando RNGCryptoServiceProvider
-            using (var rng = new RNGCryptoServiceProvider())
+            if (opts == null)
             {
-                rng.GetBytes(randomData);
+                opts = new PasswordOptions
+                {
+                    RequiredLength = 8,
+                    RequireDigit = true,
+                    RequireLowercase = true,
+                    RequireUppercase = true,
+                    RequireNonAlphanumeric = true,
+                    RequiredUniqueChars = 1
+                };
             }
 
-            // Convierte los bytes aleatorios en caracteres de la contraseña
-            char[] passwordChars = new char[8];
+            string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string lower = "abcdefghijklmnopqrstuvwxyz";
+            string digit = "1234567890";
+            string nonAlphanumeric = "!@#$%^&*()_-+=[{]};:>|./?";
 
-            // Itera sobre los bytes aleatorios y selecciona caracteres del conjunto válido
-            for (int i = 0; i < 8; i++)
+            RandomNumberGenerator rng = RandomNumberGenerator.Create();
+            List<char> chars = new List<char>();
+
+            // Garantizar inclusión de las reglas mínimas
+            if (opts.RequireUppercase) chars.Add(upper[GetRandomInt(rng, upper.Length)]);
+            if (opts.RequireLowercase) chars.Add(lower[GetRandomInt(rng, lower.Length)]);
+            if (opts.RequireDigit) chars.Add(digit[GetRandomInt(rng, digit.Length)]);
+            if (opts.RequireNonAlphanumeric) chars.Add(nonAlphanumeric[GetRandomInt(rng, nonAlphanumeric.Length)]);
+
+            // Completar el resto hasta alcanzar la longitud requerida
+            string allChars = $"{upper}{lower}{digit}{nonAlphanumeric}";
+            while (chars.Count < opts.RequiredLength || chars.Distinct().Count() < opts.RequiredUniqueChars)
             {
-                passwordChars[i] = validCharacters[randomData[i] % validCharacters.Length];
+                chars.Add(allChars[GetRandomInt(rng, allChars.Length)]);
             }
 
-            // Retorna la contraseña generada como una cadena
-            return new string(passwordChars);
+            // Mezclar los caracteres para que no sea siempre el mismo orden
+            return new string(chars.OrderBy(x => GetRandomInt(rng, int.MaxValue)).ToArray());
+        }
+
+        private static int GetRandomInt(RandomNumberGenerator rng, int max)
+        {
+            byte[] randomBytes = new byte[4];
+            rng.GetBytes(randomBytes);
+            int value = BitConverter.ToInt32(randomBytes, 0) & int.MaxValue;
+            return value % max;
         }
 
         public const string USER_NOT_FOUND = "User Not Found";
