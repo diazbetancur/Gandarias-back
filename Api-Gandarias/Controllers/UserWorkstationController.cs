@@ -25,7 +25,7 @@ public class UserWorkstationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _userWorkstationService.GetAllAsync(x => x.IsDelete == false).ConfigureAwait(false));
+        return Ok(await _userWorkstationService.GetAllAsync(x => !x.IsDelete).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class UserWorkstationController : ControllerBase
     [HttpGet("GetByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
-        return Ok(await _userWorkstationService.GetAllAsync(x => x.UserId == id && x.IsDelete == false, includeProperties: "User,Workstation").ConfigureAwait(false));
+        return Ok(await _userWorkstationService.GetAllAsync(x => x.UserId == id && !x.IsDelete, includeProperties: "User,Workstation").ConfigureAwait(false));
     }
 
     /// <summary>

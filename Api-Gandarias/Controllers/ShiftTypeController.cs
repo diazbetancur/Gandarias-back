@@ -26,7 +26,7 @@ public class ShiftTypeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _shiftTypeService.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _shiftTypeService.GetAllAsync(x => x.IsActive).ConfigureAwait(false));
     }
 
     /// <summary>

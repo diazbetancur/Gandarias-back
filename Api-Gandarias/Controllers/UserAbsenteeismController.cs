@@ -26,7 +26,7 @@ public class UserAbsenteeismController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _userAbsenteeismService.GetAllAsync(includeProperties: "User,AbsenteeismType").ConfigureAwait(false));
+        return Ok(await _userAbsenteeismService.GetAllAsync(x => x.EndDate >= DateTime.Now.AddDays(-365), includeProperties: "User,AbsenteeismType").ConfigureAwait(false));
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class UserAbsenteeismController : ControllerBase
     [HttpGet("GetByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
-        return Ok(await _userAbsenteeismService.GetAllAsync(x => x.UserId == id, includeProperties: "User,AbsenteeismType").ConfigureAwait(false));
+        return Ok(await _userAbsenteeismService.GetAllAsync(x => x.UserId == id && x.EndDate >= DateTime.Now.AddDays(-365), includeProperties: "User,AbsenteeismType").ConfigureAwait(false));
     }
 
     /// <summary>

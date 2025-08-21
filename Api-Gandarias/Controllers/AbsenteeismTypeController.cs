@@ -26,7 +26,7 @@ public class AbsenteeismTypeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _absenteeismTypeService.GetAllAsync(x => x.IsDeleted == false).ConfigureAwait(false));
+        return Ok(await _absenteeismTypeService.GetAllAsync(x => !x.IsDeleted).ConfigureAwait(false));
     }
 
     /// <summary>

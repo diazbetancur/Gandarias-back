@@ -68,7 +68,8 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpGet("GetByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
-        return Ok(await _employeeScheduleExceptionService.GetAllAsync(x => x.UserId == id).ConfigureAwait(false));
+        var fromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-365));
+        return Ok(await _employeeScheduleExceptionService.GetAllAsync(x => x.UserId == id && x.Date >= fromDate).ConfigureAwait(false));
     }
 
     /// <summary>

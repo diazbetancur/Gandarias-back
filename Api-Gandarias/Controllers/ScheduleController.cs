@@ -216,26 +216,6 @@ public class ScheduleController : ControllerBase
 
             await _scheduleService.UpdateRangeAsync(schedules);
 
-            //var groupedByUser = schedules.GroupBy(s => s.UserId);
-
-            //await ProcessSchedulesSequentially(groupedByUser, subject);
-
-            //var tasks = groupedByUser.Select(
-            //    async userGroup =>
-            //    {
-            //        var user = userGroup.FirstOrDefault();
-            //        var body = HTMLHelper.GenerateScheduleHtml(userGroup.ToList());
-
-            //        var qrCode = await _qrCodeService.GenerateUserQrAsync(user.UserId).ConfigureAwait(false);
-
-            //        if (!string.IsNullOrWhiteSpace(user?.UserEmail))
-            //        {
-            //            await _emailService.SendEmailAsync(user.UserEmail, subject, body, qrCode, $"{user.UserNickName}.png", "image/png");
-            //        }
-            //    });
-
-            //await Task.WhenAll(tasks);
-
             return Ok("Horarios notificados correctamente.");
         }
         catch (Exception Ex)
