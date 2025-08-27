@@ -56,7 +56,7 @@ public class SigningController : ControllerBase
                 return BadRequest(new
                 {
                     IsValid = false,
-                    ErrorMessage = "Usuario invalido."
+                    ErrorMessage = "Usuario invalido o informacion invalida."
                 }
                 );
             }
@@ -73,6 +73,33 @@ public class SigningController : ControllerBase
         catch (Exception)
         {
             throw;
+        }
+    }
+
+    /// <summary>
+    /// PUT api/Signing
+    /// </summary>
+    /// <param name="string"></param>
+    /// <returns></returns>
+    [HttpPut]
+    public async Task<IActionResult> Put(string DNI)
+    {
+        var userRole = User.GetRoles();
+        if (!userRole.Any(x => x == RoleType.Coordinator.ToString()))
+        {
+            return Unauthorized();
+        }
+
+        var userExist = await _userService.GetAllAsync(x => x.UserName == DNI).ConfigureAwait(false);
+
+        if (!userExist.Any())
+        {
+            return BadRequest(new
+            {
+                IsValid = false,
+                ErrorMessage = "Usuario invalido o informacion invalida."
+            }
+            );
         }
     }
 
