@@ -101,6 +101,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddTransient<IQrCodeService, QrCodeRepository>();
         services.AddTransient<IEncryptionService, AesEncryptionService>();
+        services.AddScoped<ISigningRepository, SigningRepository>();
         //services.AddScoped<IAuditService, AuditService>();
 
         services.AddHttpClient();
@@ -129,6 +130,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IEmployeeShiftRestrictionRepository, EmployeeShiftRestrictionRepository>();
         services.AddScoped<IUserShiftRepository, UserShiftRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
+        services.AddScoped<ISigningRepository, SigningRepository>();
         //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }

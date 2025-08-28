@@ -81,7 +81,7 @@ public class QrCodeRepository : IQrCodeService
                 return new QrTokenValidationResult
                 {
                     IsValid = false,
-                    ErrorMessage = "Token con formato inválido"
+                    ErrorMessage = "Token inválido"
                 };
             }
 
@@ -93,7 +93,7 @@ public class QrCodeRepository : IQrCodeService
                 return new QrTokenValidationResult
                 {
                     IsValid = false,
-                    ErrorMessage = "Datos del token con formato inválido"
+                    ErrorMessage = "Token inválido"
                 };
             }
 
@@ -102,7 +102,7 @@ public class QrCodeRepository : IQrCodeService
                 return new QrTokenValidationResult
                 {
                     IsValid = false,
-                    ErrorMessage = "Token expirado",
+                    ErrorMessage = "Token inválido",
                     UserId = userId,
                     WeekStart = weekStart,
                     WeekEnd = weekEnd,

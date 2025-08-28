@@ -45,6 +45,9 @@ namespace CC.Domain
             CreateMap<UserShift, UserShiftDto>().ReverseMap()
                 .ForMember(dest => dest.User, opt => opt.Ignore());
             CreateMap<SigningCofiguration, SigningCofigurationDto>().ReverseMap();
+            CreateMap<Signing, SigningDto>().ReverseMap()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.LastUpdateUserId, opt => opt.Ignore());
         }
     }
 }

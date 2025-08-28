@@ -1,9 +1,7 @@
 ﻿namespace CC.Domain.Dtos;
 
-public class ScheduleDto
+public class ScheduleDto : BaseDto<Guid>
 {
-    public Guid? Id { get; set; }
-
     public DateOnly Date
     {
         get; set;

@@ -112,6 +112,11 @@ namespace CC.Infrastructure.Configurations
         /// </summary>
         public DbSet<SigningCofiguration> SigningCofigurations { get; set; }
 
+        /// <summary>
+        /// SigningCofiguration
+        /// </summary>
+        public DbSet<Signing> Signings { get; set; }
+
         // TODO: Revisar si es necesario esto
 
         /// <summary>
@@ -208,6 +213,10 @@ namespace CC.Infrastructure.Configurations
             modelBuilder.Entity<Schedule>().HasKey(c => c.Id);
             modelBuilder.Entity<Schedule>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             modelBuilder.Entity<Schedule>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Signing>().HasKey(c => c.Id);
+            modelBuilder.Entity<Signing>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            modelBuilder.Entity<Signing>().Property(e => e.DateCreated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             modelBuilder.Entity<SigningCofiguration>().HasKey(c => c.Id);
             modelBuilder.Entity<SigningCofiguration>().Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
