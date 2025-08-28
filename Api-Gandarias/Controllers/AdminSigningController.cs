@@ -23,6 +23,7 @@ namespace Gandarias.Controllers
         /// <summary>
         /// GET api/AdminSigning
         /// </summary>
+        /// <param name="SigningFilterDto"></param>
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAllAsync(SigningFilterDto filter)
@@ -53,7 +54,7 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <param name="SigningDto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> Put(SigningDto signingDto)
         {
             var existingSigning = await _signingService.GetAllAsync(x => x.Id == signingDto.Id).ConfigureAwait(false);
