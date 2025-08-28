@@ -26,7 +26,7 @@ public class WorkstationController : ControllerBase
     public async Task<IActionResult> GetAllAsync()
     {
         //return Ok(await _workstationService.GetAllAsync(includeProperties: "WorkArea").ConfigureAwait(false));
-        return Ok(await _workstationService.GetAllAsync(x => !x.IsDeleted && !x.WorkArea.IsDeleted, includeProperties: "WorkArea").ConfigureAwait(false));
+        return Ok(await _workstationService.GetAllAsync(x => !x.IsDeleted && x.IsActive && !x.WorkArea.IsDeleted && x.WorkArea.IsActive, includeProperties: "WorkArea").ConfigureAwait(false));
     }
 
     /// <summary>

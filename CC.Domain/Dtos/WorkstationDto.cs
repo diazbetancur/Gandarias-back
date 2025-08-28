@@ -6,4 +6,5 @@ public class WorkstationDto : BaseDto<Guid>
     public bool? IsActive { get; set; }
     public Guid WorkAreaId { get; set; }
     public string? WorkAreaName { get; set; }
+    public bool? IsDeleted { get; set; } = false;
 }

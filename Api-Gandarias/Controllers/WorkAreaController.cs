@@ -12,10 +12,12 @@ namespace Gandarias.Controllers;
 public class WorkAreaController : ControllerBase
 {
     private readonly IWorkAreaService _workAreaService;
+    private readonly IWorkstationService _workstationService;
 
-    public WorkAreaController(IWorkAreaService workAreaService)
+    public WorkAreaController(IWorkAreaService workAreaService, IWorkstationService workstationService)
     {
         _workAreaService = workAreaService;
+        _workstationService = workstationService;
     }
 
     /// <summary>
@@ -75,6 +77,14 @@ public class WorkAreaController : ControllerBase
     {
         try
         {
+            var response = await _workstationService.GetAllAsync(x => x.WorkAreaId == workAreaDto.Id).ConfigureAwait(false);
+
+            foreach (var item in response)
+            {
+                item.IsActive = false;
+                item.IsDeleted = true;
+                await _workstationService.UpdateAsync(item).ConfigureAwait(false);
+            }
             await _workAreaService.DeleteAsync(workAreaDto).ConfigureAwait(false);
             return Ok(workAreaDto);
         }
