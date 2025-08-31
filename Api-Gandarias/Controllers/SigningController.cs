@@ -296,8 +296,8 @@ public class SigningController : ControllerBase
                 StartTime = currentTime,
                 TipoFichaje = SigningType.SinTurnoAsignado,
                 Observaciones = "Fichaje confirmado sin horario asignado",
-                IdUserLastUpdate = user.Id,
-                UpdatedAt = DateTime.Now
+                LastUpdateUserId = null,
+                UpdatedAt = DateTime.UtcNow
             };
 
             await _signingService.AddAsync(newSigning).ConfigureAwait(false);
@@ -339,7 +339,7 @@ public class SigningController : ControllerBase
 
             var signing = openSigning.First();
             signing.EndTime = time;
-            signing.IdUserLastUpdate = userDto.Id;
+            signing.LastUpdateUserId = userDto.Id;
             signing.UpdatedAt = DateTime.Now;
 
             await _signingService.UpdateAsync(signing).ConfigureAwait(false);
@@ -381,7 +381,7 @@ public class SigningController : ControllerBase
                 StartTime = time,
                 TipoFichaje = signingType,
                 Observaciones = string.Empty,
-                IdUserLastUpdate = userDto.Id,
+                LastUpdateUserId = userDto.Id,
                 UpdatedAt = DateTime.Now
             };
 

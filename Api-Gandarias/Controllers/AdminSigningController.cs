@@ -26,7 +26,7 @@ namespace Gandarias.Controllers
         /// <param name="SigningFilterDto"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync(SigningFilterDto filter)
+        public async Task<IActionResult> GetAllAsync([FromQuery] SigningFilterDto filter)
         {
             var signings = await _signingService.GetAllAsync(x =>
                 (!filter.UserId.HasValue || x.UserId == filter.UserId.Value) &&

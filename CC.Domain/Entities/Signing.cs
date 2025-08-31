@@ -11,7 +11,7 @@ namespace CC.Domain.Entities
         public TimeOnly? EndTime { get; set; }
         public SigningType TipoFichaje { get; set; }
         public string Observaciones { get; set; }
-        public Guid LastUpdateUserId { get; set; }
+        public Guid? LastUpdateUserId { get; set; }
 
         public virtual User LastUpdateUser
         {
