@@ -12,7 +12,7 @@ namespace CC.Domain.Dtos
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
 
-        public int PageNumber { get; set; } = 1;  // por defecto la primera página
-        public int PageSize { get; set; } = 100;   // por defecto 20 registros
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 100;
     }
 }

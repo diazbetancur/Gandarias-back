@@ -101,7 +101,7 @@ public class DependencyInyectionHandler
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddTransient<IQrCodeService, QrCodeRepository>();
         services.AddTransient<IEncryptionService, AesEncryptionService>();
-        services.AddScoped<ISigningRepository, SigningRepository>();
+        services.AddScoped<ISigningService, ISigningService>();
         //services.AddScoped<IAuditService, AuditService>();
 
         services.AddHttpClient();
