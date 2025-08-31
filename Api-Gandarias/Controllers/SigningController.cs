@@ -339,8 +339,7 @@ public class SigningController : ControllerBase
 
             var signing = openSigning.First();
             signing.EndTime = time;
-            signing.LastUpdateUserId = userDto.Id;
-            signing.UpdatedAt = DateTime.Now;
+            signing.UpdatedAt = DateTime.UtcNow;
 
             await _signingService.UpdateAsync(signing).ConfigureAwait(false);
 
@@ -381,7 +380,7 @@ public class SigningController : ControllerBase
                 StartTime = time,
                 TipoFichaje = signingType,
                 Observaciones = string.Empty,
-                LastUpdateUserId = userDto.Id,
+                LastUpdateUserId = null,
                 UpdatedAt = DateTime.Now
             };
 
