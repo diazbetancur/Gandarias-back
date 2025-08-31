@@ -31,7 +31,7 @@ namespace Gandarias.Controllers
             var signings = await _signingService.GetAllAsync(x =>
                 (!filter.UserId.HasValue || x.UserId == filter.UserId.Value) &&
                 (!filter.StartDate.HasValue || x.Date >= filter.StartDate.Value) &&
-                (!filter.EndDate.HasValue || x.Date <= filter.EndDate.Value)
+                (!filter.EndDate.HasValue || x.Date <= filter.EndDate.Value), includeProperties: "User"
             ).ConfigureAwait(false);
 
             return Ok(signings);
@@ -45,8 +45,8 @@ namespace Gandarias.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(SigningDto signingDto)
         {
-            await _signingService.AddAsync(signingDto).ConfigureAwait(false);
-            return Ok(signingDto);
+            var result = await _signingService.AddAsync(signingDto).ConfigureAwait(false);
+            return Ok(result);
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("SigningReport")]
-        public async Task<IActionResult> GetAllSigningAsync(SigningFilterDto filter)
+        public async Task<IActionResult> GetAllSigningAsync([FromQuery] SigningFilterDto filter)
         {
             var signings = await _signingService.GetAllAsync(x =>
                 (!filter.UserId.HasValue || x.UserId == filter.UserId.Value) &&
@@ -39,31 +39,29 @@ namespace Gandarias.Controllers
             ).ConfigureAwait(false);
 
             var report = signings
-                  .GroupBy(x => new { x.UserId, x.UserFullName, x.Date })
-                  .Select(g =>
-                  {
-                      var ordered = g.OrderBy(x => x.StartTime).ToList();
+                .GroupBy(x => new { x.UserId, x.UserFullName, x.Date })
+                .Select(g => new SigningReportDto
+                {
+                    UserId = g.Key.UserId,
+                    UserFullName = g.Key.UserFullName,
+                    Date = g.Key.Date,
 
-                      // solo tomamos máximo 2 pares válidos
-                      var entry1 = ordered.ElementAtOrDefault(0);
-                      var entry2 = ordered.ElementAtOrDefault(1);
+                    // Calcular total directamente con LINQ
+                    TotalHours = g
+                        .Where(e => e.EndTime.HasValue)
+                        .Sum(e => (e.EndTime.Value - e.StartTime).TotalHours),
 
-                      var reportItem = new SigningReportDto
-                      {
-                          UserId = g.Key.UserId,
-                          UserFullName = g.Key.UserFullName,
-                          Date = g.Key.Date,
-                          Entry1 = entry1?.StartTime,
-                          Exit1 = entry1?.EndTime,
-                          Entry2 = entry2?.StartTime,
-                          Exit2 = entry2?.EndTime,
-                          TotalHours = CalculateTotalHours(entry1, entry2)
-                      };
+                    // Contar total de registros para el día
+                    TotalEntries = g.Count(),
 
-                      return reportItem;
-                  })
-                  .OrderBy(r => r.UserFullName)
-                  .ToList();
+                    // Primer y último registro
+                    FirstEntry = g.OrderBy(x => x.StartTime).First().StartTime,
+                    LastExit = g.Where(x => x.EndTime.HasValue)
+                               .OrderByDescending(x => x.EndTime)
+                               .FirstOrDefault()?.EndTime
+                })
+                .OrderBy(r => r.UserFullName)
+                .ToList();
 
             //.Skip((filter.PageNumber - 1) * filter.PageSize)
             //.Take(filter.PageSize)
@@ -84,7 +82,7 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DetailAsyncByUser")]
-        public async Task<IActionResult> GetDetailAsyncByUser(SigningFilterDto filter)
+        public async Task<IActionResult> GetDetailAsyncByUser([FromQuery] SigningFilterDto filter)
         {
             var result = await _scheduleService.GetAllAsync(x =>
                 (!filter.UserId.HasValue || x.UserId == filter.UserId.Value) &&
@@ -113,7 +111,7 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("ScheduleReport")]
-        public async Task<IActionResult> GetAllScheduleAsync(SigningFilterDto filter)
+        public async Task<IActionResult> GetAllScheduleAsync([FromQuery] SigningFilterDto filter)
         {
             var schedule = await _scheduleService.GetAllAsync(x =>
                 (!filter.StartDate.HasValue || x.Date >= filter.StartDate.Value) &&
@@ -127,29 +125,26 @@ namespace Gandarias.Controllers
                     WorkstationName = g.Key.WorkstationName,
                     Date = g.Key.Date,
                     TotalHours = g.Sum(s =>
-                        s.StartTime.HasValue && s.EndTime.HasValue
-                            ? (s.EndTime.Value - s.StartTime.Value).TotalHours
-                            : 0
-                    )
+                    {
+                        if (!s.StartTime.HasValue || !s.EndTime.HasValue)
+                            return 0;
+
+                        var duration = s.EndTime.Value - s.StartTime.Value;
+
+                        if (duration.TotalHours < 0)
+                        {
+                            duration = duration.Add(TimeSpan.FromDays(1));
+                        }
+
+                        return duration.TotalHours;
+                    })
                 })
+                .Where(x => x.WorkstationName != null)
                 .OrderBy(r => r.WorkstationName)
                 .ThenBy(r => r.Date)
                 .ToList();
 
             return Ok(report);
-        }
-
-        private double? CalculateTotalHours(dynamic entry1, dynamic entry2)
-        {
-            double total = 0;
-
-            if (entry1?.EndTime != null)
-                total += (entry1.EndTime.Value - entry1.StartTime).TotalHours;
-
-            if (entry2?.StartTime != null && entry2?.EndTime != null)
-                total += (entry2.EndTime.Value - entry2.StartTime.Value).TotalHours;
-
-            return total > 0 ? total : null;
         }
     }
 }

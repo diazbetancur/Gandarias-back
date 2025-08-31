@@ -16,5 +16,8 @@ namespace CC.Domain.Dtos
         public TimeOnly? Entry2 { get; set; }
         public TimeOnly? Exit2 { get; set; }
         public double? TotalHours { get; set; }
+        public int TotalEntries { get; set; }
+        public TimeOnly? FirstEntry { get; set; }
+        public TimeOnly? LastExit { get; set; }
     }
 }
