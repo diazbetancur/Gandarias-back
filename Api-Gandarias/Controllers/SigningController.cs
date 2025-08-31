@@ -348,7 +348,7 @@ public class SigningController : ControllerBase
             {
                 ErrorMessage = "Turno finalizado correctamente",
                 IsValid = true,
-                Confirm = true,
+                Confirm = false,
                 HasError = false,
                 HasOpened = true
             };
