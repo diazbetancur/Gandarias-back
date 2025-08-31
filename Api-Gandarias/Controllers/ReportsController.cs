@@ -82,26 +82,21 @@ namespace Gandarias.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DetailAsyncByUser")]
-        public async Task<IActionResult> GetDetailAsyncByUser([FromQuery] SigningFilterDto filter)
+        public async Task<IActionResult> GetDetailAsyncByUser(Guid userId, DateOnly date)
         {
-            var result = await _scheduleService.GetAllAsync(x =>
-                (!filter.UserId.HasValue || x.UserId == filter.UserId.Value) &&
-                (!filter.StartDate.HasValue || x.Date >= filter.StartDate.Value) &&
-                (!filter.EndDate.HasValue || x.Date <= filter.EndDate.Value), includeProperties: "User,Workstation"
+            var schedules = await _scheduleService.GetAllAsync(
+                x => x.UserId == userId && x.Date == date,
+                includeProperties: "User,Workstation"
             ).ConfigureAwait(false);
 
-            List<ScheduleReportDto> reportList = new List<ScheduleReportDto>();
-            foreach (var item in result)
+            var reportList = schedules.Select(item => new ScheduleReportDto
             {
-                reportList.Add(new ScheduleReportDto
-                {
-                    WorkstationName = item.WorkstationName,
-                    Date = item.Date,
-                    Entry = item.StartTime.HasValue ? TimeOnly.FromTimeSpan(item.StartTime.Value) : null,
-                    Exit = item.EndTime.HasValue ? TimeOnly.FromTimeSpan(item.EndTime.Value) : null,
-                    TotalHours = item.StartTime.HasValue && item.EndTime.HasValue ? (item.EndTime.Value - item.StartTime.Value).TotalHours : null
-                });
-            }
+                WorkstationName = item.WorkstationName,
+                Date = item.Date,
+                Entry = item.StartTime.HasValue ? TimeOnly.FromTimeSpan(item.StartTime.Value) : null,
+                Exit = item.EndTime.HasValue ? TimeOnly.FromTimeSpan(item.EndTime.Value) : null,
+                TotalHours = CalculateWorkingHours(item.StartTime, item.EndTime)
+            }).ToList();
 
             return Ok(reportList);
         }
@@ -145,6 +140,21 @@ namespace Gandarias.Controllers
                 .ToList();
 
             return Ok(report);
+        }
+
+        private double? CalculateWorkingHours(TimeSpan? startTime, TimeSpan? endTime)
+        {
+            if (!startTime.HasValue || !endTime.HasValue)
+                return null;
+
+            var duration = endTime.Value - startTime.Value;
+
+            if (duration.TotalHours < 0)
+            {
+                duration = duration.Add(TimeSpan.FromDays(1));
+            }
+
+            return Math.Round(duration.TotalHours, 2);
         }
     }
 }
