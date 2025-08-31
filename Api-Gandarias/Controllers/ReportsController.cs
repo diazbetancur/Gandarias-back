@@ -53,6 +53,18 @@ namespace Gandarias.Controllers
 
                     // Contar total de registros para el día
                     TotalEntries = g.Count(),
+                    Entry1 = g.OrderBy(x => x.StartTime).First().StartTime,
+                    Exit1 = g.OrderBy(x => x.StartTime).First().EndTime,
+                    Entry2 = g.Where(x => x.EndTime.HasValue)
+                               .OrderByDescending(x => x.EndTime)
+                               .FirstOrDefault()?.StartTime == g.OrderBy(x => x.StartTime).First().StartTime ? null : g.Where(x => x.EndTime.HasValue)
+                               .OrderByDescending(x => x.EndTime)
+                               .FirstOrDefault()?.StartTime,
+                    Exit2 = g.Where(x => x.EndTime.HasValue)
+                               .OrderByDescending(x => x.EndTime)
+                               .FirstOrDefault()?.EndTime == g.OrderBy(x => x.StartTime).First().EndTime ? null : g.Where(x => x.EndTime.HasValue)
+                               .OrderByDescending(x => x.EndTime)
+                               .FirstOrDefault()?.EndTime,
 
                     // Primer y último registro
                     FirstEntry = g.OrderBy(x => x.StartTime).First().StartTime,
