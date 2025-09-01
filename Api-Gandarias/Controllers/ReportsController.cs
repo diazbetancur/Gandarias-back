@@ -13,7 +13,6 @@ namespace Gandarias.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ReportsController : ControllerBase
     {
         private readonly ISigningService _signingService;
@@ -40,37 +39,27 @@ namespace Gandarias.Controllers
 
             var report = signings
                 .GroupBy(x => new { x.UserId, x.UserFullName, x.Date })
-                .Select(g => new SigningReportDto
+                .Select(g =>
                 {
-                    UserId = g.Key.UserId,
-                    UserFullName = g.Key.UserFullName,
-                    Date = g.Key.Date,
+                    var orderedEntries = g.OrderBy(x => x.StartTime).ToArray();
 
-                    // Calcular total directamente con LINQ
-                    TotalHours = g
-                        .Where(e => e.EndTime.HasValue)
-                        .Sum(e => (e.EndTime.Value - e.StartTime).TotalHours),
-
-                    // Contar total de registros para el día
-                    TotalEntries = g.Count(),
-                    Entry1 = g.OrderBy(x => x.StartTime).First().StartTime,
-                    Exit1 = g.OrderBy(x => x.StartTime).First().EndTime,
-                    Entry2 = g.Where(x => x.EndTime.HasValue)
-                               .OrderByDescending(x => x.EndTime)
-                               .FirstOrDefault()?.StartTime == g.OrderBy(x => x.StartTime).First().StartTime ? null : g.Where(x => x.EndTime.HasValue)
-                               .OrderByDescending(x => x.EndTime)
-                               .FirstOrDefault()?.StartTime,
-                    Exit2 = g.Where(x => x.EndTime.HasValue)
-                               .OrderByDescending(x => x.EndTime)
-                               .FirstOrDefault()?.EndTime == g.OrderBy(x => x.StartTime).First().EndTime ? null : g.Where(x => x.EndTime.HasValue)
-                               .OrderByDescending(x => x.EndTime)
-                               .FirstOrDefault()?.EndTime,
-
-                    // Primer y último registro
-                    FirstEntry = g.OrderBy(x => x.StartTime).First().StartTime,
-                    LastExit = g.Where(x => x.EndTime.HasValue)
-                               .OrderByDescending(x => x.EndTime)
-                               .FirstOrDefault()?.EndTime
+                    return new SigningReportDto
+                    {
+                        UserId = g.Key.UserId,
+                        UserFullName = g.Key.UserFullName,
+                        Date = g.Key.Date,
+                        TotalHours = g.Where(e => e.EndTime.HasValue)
+                                     .Sum(e => (e.EndTime.Value - e.StartTime).TotalHours),
+                        TotalEntries = orderedEntries.Length,
+                        Entry1 = orderedEntries.Length > 0 ? orderedEntries[0].StartTime : null,
+                        Exit1 = orderedEntries.Length > 0 ? orderedEntries[0].EndTime : null,
+                        Entry2 = orderedEntries.Length > 1 ? orderedEntries[1].StartTime : null,
+                        Exit2 = orderedEntries.Length > 1 ? orderedEntries[1].EndTime : null,
+                        FirstEntry = orderedEntries.FirstOrDefault()?.StartTime,
+                        LastExit = g.Where(x => x.EndTime.HasValue)
+                                   .OrderByDescending(x => x.EndTime)
+                                   .FirstOrDefault()?.EndTime
+                    };
                 })
                 .OrderBy(r => r.UserFullName)
                 .ToList();
