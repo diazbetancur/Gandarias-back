@@ -116,7 +116,8 @@ public class WorkstationDemandTemplateController : ControllerBase
     public async Task<IActionResult> Delete(WorkstationDemandTemplateDto workstationDemandTemplateDto)
     {
         var data = await _workstationDemandService.GetAllAsync(x => x.TemplateId == workstationDemandTemplateDto.Id).ConfigureAwait(false);
-        await _workstationDemandService.DeleteRangeAsync(data).ConfigureAwait(false);
+        if (data.Any())
+            await _workstationDemandService.DeleteRangeAsync(data).ConfigureAwait(false);
         await _workstationDemandTemplateService.DeleteAsync(workstationDemandTemplateDto).ConfigureAwait(false);
         return Ok(workstationDemandTemplateDto);
     }
