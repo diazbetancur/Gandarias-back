@@ -27,7 +27,7 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        var fromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-365));
+        var fromDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-365));
         var rawData = await _employeeScheduleExceptionService.GetAllAsync(x => x.Date >= fromDate, includeProperties: "User").ConfigureAwait(false);
 
         var formatted = rawData.Select(e => new EmployeeScheduleExceptionResponseDto
@@ -68,7 +68,7 @@ public class EmployeeScheduleExceptionController : ControllerBase
     [HttpGet("GetByUserId/{id}")]
     public async Task<IActionResult> GetByUserId(Guid id)
     {
-        var fromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-365));
+        var fromDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-365));
         return Ok(await _employeeScheduleExceptionService.GetAllAsync(x => x.UserId == id && x.Date >= fromDate).ConfigureAwait(false));
     }
 

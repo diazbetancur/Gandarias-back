@@ -8,7 +8,7 @@ public class WorkstationDemand : EntityBase<Guid>
     public Guid WorkstationId { get; set; }
     public Workstation Workstation { get; set; }
 
-    public DayOfWeek Day { get; set; }
+    public int Day { get; set; }
 
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }

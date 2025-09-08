@@ -3,7 +3,7 @@
 public class DemandInsertUpdateDto
 {
     public Guid workstationId { get; set; }
-    public DayOfWeek day { get; set; }
+    public int day { get; set; }
     public int hora { get; set; }
     public int fraccion { get; set; }
     public double effortRequired { get; set; }
