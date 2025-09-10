@@ -6,6 +6,7 @@ using CC.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -154,7 +155,7 @@ public class ScheduleController : ControllerBase
     /// </summary>
     /// <param name="ScheduleDto"></param>
     /// <returns></returns>
-    [HttpDelete()]
+    [HttpDelete]
     public async Task<IActionResult> Delete(ScheduleDto scheduleDto)
     {
         scheduleDto.IsDeleted = true;
@@ -166,7 +167,37 @@ public class ScheduleController : ControllerBase
     /// POST api/Schedule/notify?fechaIni=2025-07-01&fechaFin=2025-07-31
     /// </summary>
     /// <param name="fechaIni"></param>
-    /// <param name="fechaFin"></param>
+    /// <returns></returns>
+    [HttpDelete("{fechaIni}")]
+    public async Task<IActionResult> DeleteAsync(DateOnly fechaIni)
+    {
+        try
+        {
+            var userRole = User.GetRoles();
+            if (!userRole.Any(x => x == RoleType.Admin.ToString()))
+            {
+                return Unauthorized("Solo los administradores pueden eliminar horarios.");
+            }
+            var schedules = await _scheduleService.GetAllAsync(x => x.Date >= fechaIni && x.Date <= fechaIni.AddDays(6) && !x.IsDeleted);
+
+            if (!schedules.Any())
+            {
+                return BadRequest("No hay horarios para eliminar en el rango de fechas especificado.");
+            }
+
+            await _scheduleService.DeleteRangeAsync(schedules).ConfigureAwait(false);
+            return Ok("Horario eliminado correctamente.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest("Error al eliminar horarios.");
+        }
+    }
+
+    /// <summary>
+    /// POST api/Schedule/notify?fechaIni=2025-07-01&fechaFin=2025-07-31
+    /// </summary>
+    /// <param name="fechaIni"></param>
     /// <returns></returns>
     [HttpPost("notify")]
     public async Task<IActionResult> NotifySchedules(DateOnly fechaIni)
