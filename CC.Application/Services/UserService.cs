@@ -276,18 +276,36 @@ namespace CC.Application.Services
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim("LastName", user.LastName),
-                new Claim("UserName", user.UserName),
+                new Claim("LastName", user.LastName ?? string.Empty),
+                new Claim("UserName", user.UserName ?? string.Empty),
                 new Claim("UserId", user.Id.ToString()),
-                new Claim("Email", user.Email),
-                new Claim("Name", user.FirstName),
+                new Claim("Email", user.Email ?? string.Empty),
+                new Claim("Name", user.FirstName ?? string.Empty),
             };
 
             claims.Add(new Claim("Role", string.Join(",", roles)));
             claims.Add(new Claim("Permissions", string.Join(",", permissions)));
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]));
+            // Unificar fuente de clave: 1) Env var 2) Config
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+                         ?? _configuration["jwtKey"];
+
+            // Evitar usar plantillas o valores inválidos
+            if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("${"))
+            {
+                throw new InvalidOperationException("JWT secret key not configured properly. Set environment variable JWT_SECRET_KEY with at least 32 characters.");
+            }
+
+            // Validar longitud mínima para HS256 (>= 32 chars => 256 bits)
+            if (jwtKey.Length < 32)
+            {
+                throw new InvalidOperationException($"JWT secret key too short: {jwtKey.Length} chars. Minimum 32 chars required for HS256.");
+            }
+
+            var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
+            SymmetricSecurityKey key = new SymmetricSecurityKey(keyBytes);
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             DateTime expiration = roles.Any(x =>
                 string.Equals(x, RoleType.Coordinator.ToString(), StringComparison.OrdinalIgnoreCase))
                 ? DateTime.UtcNow.AddHours(24)

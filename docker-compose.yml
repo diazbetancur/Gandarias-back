@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DATABASE_URL=Host=postgres;Port=5432;Username=gandarias;Password=gandarias123;Database=gandarias;Include Error Detail=true
+      - JWT_SECRET_KEY=lk34j5l34jjk34h5kasadsf#$%SfaetfASDfASDFA345345345##$%#FASefaRQ@#$%eFGEAY%$SEVQ345wfw344tw4tqTW#Vw5gw45ytq%T@$%DFASDFasdfasdASDFasdfASDF#$%34534#$SDF
+      - SMTP_SERVER=localhost
+      - SMTP_PORT=587
+      - SMTP_USER=test@localhost
+      - SMTP_PASSWORD=testpassword
+      - FRONTEND_URL=http://localhost:3000
+      - PYTHON_API_URL=https://gchlubzoicprv6c7ruoaoe6dmi0jqxpg.lambda-url.us-east-2.on.aws
+      - ENCRYPTION_KEY=O383TLC7mk3/ow8MWglORMBc8GRWzAfdieLTQDbf7As=
+      - ENCRYPTION_IV=KOOFbeLOvSo5li1ulRVuxA==
+    depends_on:
+      - postgres
+    networks:
+      - gandarias-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=gandarias
+      - POSTGRES_USER=gandarias
+      - POSTGRES_PASSWORD=gandarias123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gandarias-network
+
+volumes:
+  postgres_data:
+
+networks:
+  gandarias-network:
+    driver: bridge

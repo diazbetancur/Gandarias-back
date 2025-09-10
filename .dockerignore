@@ -1,0 +1,80 @@
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/azds.yaml
+**/bin
+**/charts
+**/docker-compose*
+**/Dockerfile*
+**/node_modules
+**/npm-debug.log
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+LICENSE
+README.md
+**/.classpath
+**/.factorypath
+**/.project
+**/.settings
+**/target
+.git/
+.vs/
+obj/
+bin/
+logs/
+*.log
+
+# Ignore common directories and files that shouldn't be in Docker context
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/node_modules/
+**/logs/
+
+# Ignore Git files
+.git
+.gitignore
+.gitattributes
+
+# Ignore documentation and scripts
+*.md
+README.md
+**/*.md
+*.ps1
+*.sh
+
+# Ignore local configuration files
+**/*local.json
+**/appsettings.Development.json
+
+# Ignore test files
+**/*Tests/
+**/*Test/
+**/TestResults/
+
+# Ignore temporary files
+**/*.tmp
+**/*.temp
+**/.DS_Store
+**/Thumbs.db
+
+# Ignore IDE files
+**/*.user
+**/*.suo
+**/*.userprefs
+**/.idea/
+
+# Ignore package files
+**/*.nupkg
+**/packages/

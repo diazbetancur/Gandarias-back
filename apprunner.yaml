@@ -1,0 +1,20 @@
+version: 1.0
+runtime: docker
+build:
+  commands:
+    build:
+      - echo "Building .NET 8 application"
+      - echo "Docker image will be used from ECR"
+run:
+  runtime-version: latest
+  command: dotnet Api-Gandarias.dll
+  network:
+    port: 80
+    env: PORT
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: Production
+    - name: ASPNETCORE_URLS
+      value: http://+:80
+    - name: ASPNETCORE_CONTENTROOT
+      value: /app
