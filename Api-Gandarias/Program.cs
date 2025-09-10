@@ -4,40 +4,32 @@ using Gandarias.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// Cargar configuraciones basadas en el entorno
+// Environment & Config
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+// Services
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-#region Swagger
-
+// Swagger
 SwaggerHandler.SwaggerConfig(builder.Services);
 
-# endregion
+// Dependency Injection (pass configuration & environment)
+DependencyInyectionHandler.DepencyInyectionConfig(builder.Services, builder.Configuration, builder.Environment.EnvironmentName);
 
-#region Register (dependency injection)
-
-DependencyInyectionHandler.DepencyInyectionConfig(builder.Services);
-
-#endregion Register (dependency injection)
-
-#region IdentityCore
-
+// Identity
 builder.Services.AddIdentity<User, Role>(opt =>
 {
     opt.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
@@ -50,35 +42,43 @@ builder.Services.AddIdentity<User, Role>(opt =>
     opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
 }).AddRoles<Role>().AddEntityFrameworkStores<DBContext>().AddDefaultTokenProviders();
 
-#endregion IdentityCore
+// JWT - read from env first, then config
+var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+            ?? builder.Configuration["jwtKey"]
+            ?? string.Empty;
 
-# region JWT
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("${"))
+{
+    throw new InvalidOperationException("JWT secret key not configured properly. Set JWT_SECRET_KEY env var with at least 32 characters.");
+}
+if (jwtKey.Length < 32)
+{
+    throw new InvalidOperationException($"JWT secret key too short: {jwtKey.Length} chars. Minimum 32 required.");
+}
+Console.WriteLine($"JWT key length OK: {jwtKey.Length} chars");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(x =>
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
-        ClockSkew = TimeSpan.Zero
+        x.RequireHttpsMetadata = false; // App Runner terminates TLS
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromMinutes(5)
+        };
     });
-
-#endregion Swagger
 
 var app = builder.Build();
 
-SeedData(app);
+// Health endpoint
+app.MapHealthChecks("/health");
 
-void SeedData(WebApplication app)
-{
-    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
-    using var scope = scopedFactory!.CreateScope();
-    var service = scope.ServiceProvider.GetService<SeedDB>();
-    service!.SeedAsync().Wait();
-}
-
-// Configure the HTTP request pipeline.
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -87,13 +87,17 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gandarias API V1");
+        c.RoutePrefix = "swagger";
+    });
 
-    #region Headers
-
+    // Security headers
     app.Use(async (context, next) =>
     {
         context.Response.Headers.Clear();
-
         context.Response.Headers.Add("Content-Security-Policy",
             "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:");
         context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
@@ -107,24 +111,34 @@ else
         context.Response.Headers.Add("Referrer-Policy", "no-referrer");
         context.Response.Headers.Add("Permissions-Policy", "fullscreen=(), geolocation=()");
         context.Request.Headers.Add("X-Content-Type-Options", "nosniff");
-
         await next();
     });
-
-    #endregion Headers
 }
 
+// CORS (wide open - restrict as needed)
 app.UseCors(x => x
-.AllowAnyMethod()
-.AllowAnyHeader()
-.SetIsOriginAllowed(origin => true)
-.AllowCredentials());
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true)
+    .AllowCredentials());
 
-app.UseHttpsRedirection();
+// HTTPS redirection: disable in App Runner (PORT set); allow in local dev
+var disableHttps = Environment.GetEnvironmentVariable("DISABLE_HTTPS_REDIRECT") == "true";
+var portEnv = Environment.GetEnvironmentVariable("PORT");
+if (!disableHttps && string.IsNullOrEmpty(portEnv) && app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 app.UseAuthentication();
 app.UseMiddleware<ActivityLoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
+
+// Bind to PORT (App Runner) or default 8080
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
+Console.WriteLine($"Listening on http://0.0.0.0:{port}");
 
 app.Run();

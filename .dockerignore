@@ -1,0 +1,29 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/node_modules/
+**/logs/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+**/*.user
+**/*.suo
+**/.idea/
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# Local settings
+**/*local.json
+**/appsettings.Development.json
+
+# Tests
+**/*Tests/
+**/*Test/
+**/TestResults/

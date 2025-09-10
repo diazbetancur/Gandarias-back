@@ -17,63 +17,153 @@ namespace Gandarias.Handlers;
 
 public class DependencyInyectionHandler
 {
-    public static void DepencyInyectionConfig(IServiceCollection services)
+    public static void DepencyInyectionConfig(IServiceCollection services, IConfiguration configuration, string environment)
     {
-        IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+        try
+        {
+            Console.WriteLine($"Environment detected in DI: {environment}");
 
-        IConfiguration configuration = builder.Build();
+            #region Database Configuration
 
-        services.AddSingleton(configuration);
+            // Prefer environment variable in container
+            string? connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = configuration.GetConnectionString("PgSQL");
+                Console.WriteLine("DB: Using configuration connection string (PgSQL)");
+            }
+            else
+            {
+                Console.WriteLine("DB: Using DATABASE_URL from environment");
+            }
 
-        #region PgSQL
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("Database connection string not found");
 
-        services.AddDbContext<DBContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("PgSQL")));
+            services.AddDbContext<DBContext>(opt =>
+            {
+                opt.UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorCodesToAdd: null);
+                    npgsqlOptions.CommandTimeout(300);
+                    npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                });
 
-        #endregion PgSQL
+                opt.EnableSensitiveDataLogging(environment == "Development");
+                opt.EnableDetailedErrors(environment == "Development");
+                opt.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            });
 
-        #region Automapper
+            Console.WriteLine("✅ PostgreSQL DbContext configured");
 
-        services.AddAutoMapper(Assembly.Load("CC.Domain"));
+            #endregion
 
-        #endregion Automapper
+            #region AutoMapper
 
-        #region ServiceRegistrarion
+            services.AddAutoMapper(Assembly.Load("CC.Domain"));
 
-        ServicesRegistration(services);
+            #endregion
 
-        #endregion ServiceRegistrarion
+            #region Services and Repositories
 
-        #region RepositoriesRegistrarion
+            ServicesRegistration(services);
+            RepositoryRegistration(services);
 
-        RepositoryRegistration(services);
+            #endregion
 
-        #endregion RepositoriesRegistrarion
+            #region EmailService
 
-        #region EmailService
+            try
+            {
+                services.Configure<EmailServiceOptions>(options =>
+                {
+                    options.SmtpServer = GetValidEnvironmentVariable("SMTP_SERVER")
+                        ?? configuration["EmailService:smtpServer"]
+                        ?? "localhost";
 
-        services.Configure<EmailServiceOptions>(
-            configuration.GetSection("EmailService")
-        );
+                    var smtpPortEnv = GetValidIntFromEnvironment("SMTP_PORT", 587);
+                    var smtpPortConfig = configuration["EmailService:smtpPort"];
+                    if (smtpPortEnv.HasValue) options.SmtpPort = smtpPortEnv.Value;
+                    else if (!string.IsNullOrEmpty(smtpPortConfig) && !smtpPortConfig.Contains("${")) options.SmtpPort = int.Parse(smtpPortConfig);
+                    else options.SmtpPort = 587;
 
-        #endregion EmailService
+                    options.SmtpUser = GetValidEnvironmentVariable("SMTP_USER")
+                        ?? configuration["EmailService:smtpUser"]
+                        ?? "test@localhost";
 
-        services.AddSingleton<ExceptionControl>();
+                    options.SmtpPassword = GetValidEnvironmentVariable("SMTP_PASSWORD")
+                        ?? configuration["EmailService:smtpPassword"]
+                        ?? "password";
 
-        #region Logs
+                    var enableSslEnv = GetValidBoolFromEnvironment("SMTP_ENABLE_SSL", true);
+                    var enableSslConfig = configuration["EmailService:EnableSsl"];
+                    if (enableSslEnv.HasValue) options.EnableSsl = enableSslEnv.Value;
+                    else if (!string.IsNullOrEmpty(enableSslConfig) && !enableSslConfig.Contains("${")) options.EnableSsl = bool.Parse(enableSslConfig);
+                    else options.EnableSsl = true;
+                });
 
-        Logger logger = new LoggerConfiguration()
-            .WriteTo
-            .File("log.txt",
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-            .CreateLogger();
+                Console.WriteLine("✅ Email service configured");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Email service configuration warning: {ex.Message}");
+            }
 
-        logger.Information("Done setting up serilog - Application starting up");
+            #endregion
 
-        services.AddSingleton<ILogger>(logger);
+            services.AddSingleton<ExceptionControl>();
 
-        #endregion Logs
+            #region Logging
 
-        services.AddTransient<SeedDB>();
+            Logger logger = new LoggerConfiguration()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.File("logs/log-.txt",
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                    retainedFileCountLimit: 7)
+                .CreateLogger();
+
+            logger.Information("DI configured for {Environment}", environment);
+            services.AddSingleton<ILogger>(logger);
+
+            #endregion
+
+            services.AddTransient<SeedDB>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"DI failure: {ex.Message}");
+            throw new InvalidOperationException("Dependency injection configuration failed", ex);
+        }
+    }
+
+    private static string? GetValidEnvironmentVariable(string variableName)
+    {
+        var value = Environment.GetEnvironmentVariable(variableName);
+        if (string.IsNullOrWhiteSpace(value) || value.Contains("${") || (value.Contains("$") && value.Contains("{") && value.Contains("}")))
+            return null;
+        return value;
+    }
+
+    private static int? GetValidIntFromEnvironment(string variableName, int defaultValue)
+    {
+        var value = GetValidEnvironmentVariable(variableName);
+        if (value == null) return null;
+        if (int.TryParse(value, out int result)) return result;
+        Console.WriteLine($"Warning: env {variableName} invalid int: {value}");
+        return null;
+    }
+
+    private static bool? GetValidBoolFromEnvironment(string variableName, bool defaultValue)
+    {
+        var value = GetValidEnvironmentVariable(variableName);
+        if (value == null) return null;
+        if (bool.TryParse(value, out bool result)) return result;
+        Console.WriteLine($"Warning: env {variableName} invalid bool: {value}");
+        return null;
     }
 
     public static void ServicesRegistration(IServiceCollection services)
@@ -102,7 +192,6 @@ public class DependencyInyectionHandler
         services.AddTransient<IQrCodeService, QrCodeRepository>();
         services.AddTransient<IEncryptionService, AesEncryptionService>();
         services.AddScoped<ISigningService, SigningService>();
-        //services.AddScoped<IAuditService, AuditService>();
 
         services.AddHttpClient();
     }
@@ -131,6 +220,5 @@ public class DependencyInyectionHandler
         services.AddScoped<IUserShiftRepository, UserShiftRepository>();
         services.AddScoped<IScheduleRepository, ScheduleRepository>();
         services.AddScoped<ISigningRepository, SigningRepository>();
-        //services.AddScoped<IAuditRepository, AuditRepository>();
     }
 }
