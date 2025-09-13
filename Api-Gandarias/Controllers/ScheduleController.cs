@@ -1,4 +1,6 @@
-﻿using CC.Domain.Dtos;
+﻿using Amazon.Lambda;
+using Amazon.Lambda.Model;
+using CC.Domain.Dtos;
 using CC.Domain.Entities;
 using CC.Domain.Enums;
 using CC.Domain.Helpers;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Gandarias.Controllers;
@@ -58,12 +61,14 @@ public class ScheduleController : ControllerBase
             x.Date <= fechaFin &&
             (!userId.HasValue || x.UserId == userId), includeProperties: "User,Workstation.WorkArea").ConfigureAwait(false);
 
-            if (!results.Any() && userRole.Any(x => x == RoleType.Admin.ToString()))
-            {
-                results = await AutomaticSchedule(fechaIni);
-            }
-
             return Ok(results);
+
+            //if (!results.Any() && userRole.Any(x => x == RoleType.Admin.ToString()))
+            //{
+            //    results = await AutomaticSchedule(fechaIni);
+            //}
+
+            //return Ok(results);
         }
         catch (Exception)
         {
@@ -259,28 +264,44 @@ public class ScheduleController : ControllerBase
     {
         try
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            //var httpClient = _httpClientFactory.CreateClient();
 
-            var baseUrl = _configuration["PythonApiSettings:BaseUrl"];
+            //var baseUrl = _configuration["PythonApiSettings:BaseUrl"];
             var timeout = _configuration.GetValue<int>("PythonApiSettings:Timeout", 1520);
 
-            httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+            //httpClient.Timeout = TimeSpan.FromSeconds(timeout);
 
             var weekStart = fechaIni.ToString("yyyy-MM-dd");
 
             var requestBody = new
             {
-                week_start = weekStart,
-                force = false
+                path = "/api/agenda/save", // si tu lambda necesita saber la ruta
+                httpMethod = "POST",
+                body = new { week_start = weekStart, force = false }
             };
 
-            var json = System.Text.Json.JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var jsonPayload = JsonSerializer.Serialize(requestBody);
 
-            var requestUrl = $"{baseUrl}/api/agenda/save";
-            var response = await httpClient.PostAsync(requestUrl, content);
+            var config = new AmazonLambdaConfig
+            {
+                Timeout = TimeSpan.FromSeconds(timeout)
+            };
+            using var lambdaClient = new AmazonLambdaClient(config);
+            var invokeRequest = new InvokeRequest
+            {
+                FunctionName = _configuration["PythonApiSettings:FunctionName"],
+                Payload = jsonPayload
+            };
 
-            if (response.IsSuccessStatusCode)
+            //var json = System.Text.Json.JsonSerializer.Serialize(requestBody);
+            //var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            //var requestUrl = $"{baseUrl}/api/agenda/save";
+            //var response = await httpClient.PostAsync(requestUrl, content);
+
+            var response = await lambdaClient.InvokeAsync(invokeRequest);
+
+            if (response.StatusCode == 200)
             {
                 DateOnly fechaFin = fechaIni.AddDays(6);
                 return await _scheduleService.GetAllAsync(x => !x.IsDeleted &&
@@ -289,8 +310,7 @@ public class ScheduleController : ControllerBase
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Python API error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Lambda error: {response.StatusCode} - {response.FunctionError}");
             }
         }
         catch (Exception ex)
