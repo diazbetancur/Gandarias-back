@@ -63,6 +63,7 @@ public class ShiftTypeController : ControllerBase
     public async Task<IActionResult> Put(Guid id, ShiftTypeDto shiftTypeDto)
     {
         shiftTypeDto.Id = id;
+        shiftTypeDto.IsActive = true;
         await _shiftTypeService.UpdateAsync(shiftTypeDto).ConfigureAwait(false);
         return Ok(shiftTypeDto);
     }

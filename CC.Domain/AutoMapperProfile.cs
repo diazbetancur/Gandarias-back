@@ -25,7 +25,8 @@ namespace CC.Domain
                 .ForMember(des => des.WorkstationB, opt => opt.Ignore())
                 .ForMember(des => des.WorkstationC, opt => opt.Ignore())
                 .ForMember(des => des.WorkstationD, opt => opt.Ignore());
-            CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap();
+            CreateMap<EmployeeScheduleRestriction, EmployeeScheduleRestrictionDto>().ReverseMap()
+                .ForMember(des => des.User, opt => opt.Ignore());
             CreateMap<AbsenteeismType, AbsenteeismTypeDto>().ReverseMap();
             CreateMap<UserAbsenteeism, UserAbsenteeismDto>().ReverseMap()
             .ForMember(dest => dest.User, opt => opt.Ignore())

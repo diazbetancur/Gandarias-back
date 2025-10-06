@@ -27,7 +27,9 @@ public class EmployeeScheduleRestrictionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _employeeScheduleRestriction.GetAllAsync().ConfigureAwait(false));
+        return Ok(await _employeeScheduleRestriction
+            .GetAllAsync(x => x.User.IsActive && !x.User.IsDelete
+        , includeProperties: "User").ConfigureAwait(false));
     }
 
     /// <summary>

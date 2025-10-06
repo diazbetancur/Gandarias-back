@@ -6,7 +6,7 @@ public class EmployeeScheduleRestrictionDto
 {
     public Guid? Id { get; set; }
     public Guid UserId { get; set; }
-
+    public string? UserNickName { get; set; }
     public DayOfWeek DayOfWeek { get; set; }
 
     public String RestrictionType { get; set; }
